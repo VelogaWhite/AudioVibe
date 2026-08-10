@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+venv/
+__pycache__/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Build Outputs
+.next/
+dist/
+out/
+*.egg-info/
+
+# Testing & Coverage outputs
+coverage/
+test-results/
+playwright-report/
+
+# OS & Editor Files
+.DS_Store
+.vscode/
+.idea/
