@@ -53,3 +53,30 @@ POST /playlists/export
 - playlistId: string
 - spotifyPlaylistId: string
 - isExported: boolean
+
+## Search Tracks
+
+### Endpoint
+
+GET `/playlists/search?userId={internalUserId}&query={query}&limit={1-50}`
+
+### Response Body
+
+`TrackDTO[]`
+
+## Playlist Management
+
+- GET `/playlists?userId={internalUserId}`
+- POST `/playlists`
+- GET `/playlists/{playlistId}?userId={internalUserId}`
+- PATCH `/playlists/{playlistId}`
+- DELETE `/playlists/{playlistId}?userId={internalUserId}`
+- POST `/playlists/{playlistId}/tracks`
+- DELETE `/playlists/{playlistId}/tracks/{trackId}?userId={internalUserId}`
+- PATCH `/playlists/{playlistId}/tracks/order`
+
+## Audio Features
+
+GET `/tracks/audio-features?userId={internalUserId}&trackIds={id1,id2}`
+
+The result is cached with `track:features:{trackId}` for 7 days.

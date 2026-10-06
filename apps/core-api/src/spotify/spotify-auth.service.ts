@@ -58,6 +58,33 @@ export class SpotifyAuthService {
 
   return response.json();
 }
+async refreshAccessToken(refreshToken: string) {
+  const credentials = Buffer.from(
+    `${this.clientId}:${this.clientSecret}`,
+  ).toString('base64');
+
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+
+    throw new Error(
+      `Spotify token refresh failed: ${response.status} ${errorBody}`,
+    );
+  }
+
+  return response.json();
+}
 async getCurrentUserProfile(accessToken: string) {
   const response = await fetch('https://api.spotify.com/v1/me', {
     headers: {

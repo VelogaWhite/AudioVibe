@@ -8,6 +8,10 @@ import {
 export class ExportPlaylistRequestDTO {
   @IsString()
   @IsNotEmpty()
+  userId: string;
+
+  @IsString()
+  @IsNotEmpty()
   playlistId: string;
 
   @IsString()

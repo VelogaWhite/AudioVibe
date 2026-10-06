@@ -4,6 +4,6 @@ export type SpotifyUserData = {
   displayName: string | null;
   profileImageUrl: string | null;
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
   tokenExpiresAt: Date;
 };

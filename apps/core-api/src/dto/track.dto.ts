@@ -1,7 +1,10 @@
 import {
+  IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -32,7 +35,16 @@ export class TrackDTO {
   @IsString()
   previewUrl: string | null;
 
+  @IsInt()
+  @Min(0)
+  durationMs: number;
+
+  @IsInt()
+  @Min(0)
+  popularity: number;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => AudioFeaturesDTO)
-  audioFeatures: AudioFeaturesDTO;
+  audioFeatures?: AudioFeaturesDTO | null;
 }
