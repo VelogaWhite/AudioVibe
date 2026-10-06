@@ -25,7 +25,6 @@ export class SpotifyAdapter implements IMusicProviderAdapter {
     if (!user) throw new Error('User not found');
     const accessToken = await this.spotifyTokenService.getValidAccessToken(userId);
     const response = await this.spotifyApiClient.createSpotifyPlaylist(
-      user.spotifyId,
       name,
       isPublic,
       accessToken,

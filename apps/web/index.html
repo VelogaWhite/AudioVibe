@@ -3,88 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AudioVibe Backend Console</title>
+  <title>AudioVibe</title>
   <style>
-    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #101413; color: #e7f3ed; }
-    body { margin: 0; min-height: 100vh; background: radial-gradient(circle at top right, #173c2b, #101413 50%); }
-    main { max-width: 1100px; margin: auto; padding: 32px 20px 60px; }
-    h1 { margin-bottom: 6px; } .muted { color: #99b3a6; }
-    .grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 18px; margin-top: 22px; }
-    .card { background: #18211d; border: 1px solid #2c4539; border-radius: 16px; padding: 18px; box-shadow: 0 10px 30px #0003; }
-    label { display: block; color: #a9c9ba; font-size: 13px; margin: 12px 0 5px; }
-    input, button { width: 100%; box-sizing: border-box; border-radius: 9px; border: 1px solid #426653; padding: 11px; background: #0e1713; color: inherit; }
-    button { margin-top: 14px; background: #1ed760; color: #07130c; border: 0; font-weight: 700; cursor: pointer; }
-    button.secondary { background: #294538; color: #e7f3ed; } button:hover { filter: brightness(1.1); }
-    .status { padding: 10px; border-radius: 9px; background: #10271c; color: #9ff0ba; margin-top: 14px; white-space: pre-wrap; }
-    .results { display: grid; gap: 10px; margin-top: 14px; max-height: 520px; overflow: auto; }
-    .track { display: grid; grid-template-columns: 58px 1fr auto; gap: 12px; align-items: center; padding: 9px; border-radius: 10px; background: #111a16; }
-    .track img { width: 58px; height: 58px; object-fit: cover; border-radius: 7px; } .track strong { display: block; }
-    .track small { color: #9bb5a8; } .track button { width: auto; margin: 0; padding: 8px 10px; }
-    .check { display: flex; justify-content: space-between; border-bottom: 1px solid #294136; padding: 10px 0; }
-    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #0b120f; color: #eef8f2; }
+    * { box-sizing: border-box; } body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 80% 0, #1c5238, #0b120f 48%); }
+    main { max-width: 1180px; margin: auto; padding: 28px 18px 60px; } h1 { margin: 0 0 4px; } h2 { margin: 0 0 14px; font-size: 19px; }
+    .muted, small { color: #9eb7a8; } .layout { display: grid; grid-template-columns: 320px 1fr; gap: 18px; margin-top: 22px; }
+    .card { background: #152019ee; border: 1px solid #2c4a39; border-radius: 16px; padding: 17px; box-shadow: 0 12px 35px #0004; }
+    .profile { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; } .profile img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; background: #2a4435; }
+    .profile strong { display: block; font-size: 17px; } label { display: block; margin: 11px 0 5px; color: #a9c9b5; font-size: 13px; }
+    input, select, button { width: 100%; border: 1px solid #41664e; border-radius: 9px; padding: 10px; background: #0d1711; color: inherit; }
+    button { margin-top: 10px; border: 0; background: #1ed760; color: #06140a; font-weight: 700; cursor: pointer; } button.secondary { background: #294536; color: #eaf5ee; }
+    button.danger { background: #753d3d; color: #fff0f0; } button.small { width: auto; padding: 7px 9px; margin: 0; font-size: 12px; }
+    .status { margin-top: 13px; padding: 10px; border-radius: 9px; background: #10281c; color: #a9edbd; white-space: pre-wrap; font-size: 13px; }
+    .results, .playlist-tracks { display: grid; gap: 10px; } .track { display: grid; grid-template-columns: 58px 1fr auto; gap: 11px; align-items: center; padding: 9px; border-radius: 10px; background: #0f1913; }
+    .track img { width: 58px; height: 58px; border-radius: 7px; object-fit: cover; background: #203529; } .track strong { display: block; } .track small { display: block; margin-top: 3px; }
+    .track-actions { display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; } .track-actions button { margin: 0; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 16px; } .toolbar button { width: auto; margin: 0; } .section { margin-top: 20px; }
+    .empty { color: #9eb7a8; padding: 20px 0; text-align: center; } audio { width: 180px; height: 30px; }
+    @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } .track { grid-template-columns: 48px 1fr; } .track img { width: 48px; height: 48px; } .track-actions { grid-column: 1 / -1; justify-content: flex-start; } }
   </style>
 </head>
 <body>
 <main>
-  <h1>AudioVibe Backend Console</h1>
-  <div class="muted">ตรวจสอบ Search, Track, Audio Features, Playlist และ Export ผ่าน Core API</div>
-  <div class="grid">
-    <section class="card">
-      <h2>Progress</h2>
-      <div class="check"><span>Search + DTO</span><span>✓</span></div>
-      <div class="check"><span>Redis cache</span><span>✓</span></div>
-      <div class="check"><span>Track persistence</span><span>✓</span></div>
-      <div class="check"><span>Audio features</span><span>✓</span></div>
-      <div class="check"><span>Playlist CRUD</span><span>✓</span></div>
-      <div class="check"><span>Spotify export</span><span>✓</span></div>
-      <label for="userId">Internal user ID</label>
-      <input id="userId" value="a5d8adf6-3914-47ed-9969-30fad7e10e37" />
-      <label for="query">Search query</label>
-      <input id="query" value="lofi" />
-      <button onclick="searchTracks()">Search Spotify</button>
-      <button class="secondary" onclick="loadPlaylists()">Load my playlists</button>
-      <div id="status" class="status">พร้อมตรวจสอบ</div>
-    </section>
-    <section class="card">
-      <h2>Search results</h2>
-      <div id="results" class="results"><div class="muted">กด Search Spotify เพื่อเริ่ม</div></div>
+  <h1>AudioVibe</h1>
+  <div class="muted">Search, manage and export your Spotify playlists</div>
+  <div class="layout">
+    <aside>
+      <section class="card">
+        <div class="profile"><img id="profileImage" alt="Spotify profile" /><div><strong id="profileName">Loading...</strong><small id="profileId"></small></div></div>
+        <label for="playlistSelect">Active playlist</label><select id="playlistSelect" onchange="selectPlaylist()"><option value="">No playlist selected</option></select>
+        <button onclick="createPlaylist()">＋ New playlist</button>
+        <button class="secondary" onclick="loadPlaylists()">Refresh playlists</button>
+        <div id="status" class="status">Connecting to AudioVibe...</div>
+      </section>
+      <section class="card section"><h2>Current playlist</h2><div id="playlistSummary" class="muted">เลือก Playlist เพื่อดูรายละเอียด</div><button id="exportButton" onclick="exportPlaylist()" disabled>Export to Spotify</button><button class="secondary" onclick="renamePlaylist()">Rename</button><button class="danger" onclick="deletePlaylist()">Delete playlist</button></section>
+    </aside>
+    <section>
+      <section class="card"><h2>Search Spotify</h2><div class="toolbar"><input id="query" value="lofi" placeholder="เพลงหรือศิลปิน" /><button onclick="searchTracks()">Search</button></div><div id="results" class="results"><div class="empty">ค้นหาเพลงเพื่อเริ่มต้น</div></div></section>
+      <section class="card section"><h2>Playlist tracks</h2><div id="playlistTracks" class="playlist-tracks"><div class="empty">ยังไม่มีเพลงใน Playlist</div></div></section>
     </section>
   </div>
 </main>
 <script>
-  const state = { tracks: [] };
+  const USER_ID = 'a5d8adf6-3914-47ed-9969-30fad7e10e37';
+  const state = { tracks: [], playlists: [], selected: null };
   const $ = (id) => document.getElementById(id);
+  const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
   function status(message) { $('status').textContent = message; }
-  async function api(url, options) {
-    const response = await fetch(url, options);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
-    return data;
-  }
-  async function searchTracks() {
-    try {
-      status('กำลังค้นหา...');
-      state.tracks = await api(`/playlists/search?userId=${encodeURIComponent($('userId').value)}&query=${encodeURIComponent($('query').value)}&limit=10`);
-      $('results').innerHTML = state.tracks.map((track, index) => `<article class="track"><img src="${track.albumCoverUrl || ''}" alt=""><div><strong>${escapeHtml(track.title)}</strong><small>${escapeHtml(track.artistName)} · ${escapeHtml(track.albumName)}</small></div><button onclick="saveTrack(${index})">Save</button></article>`).join('');
-      status(`ค้นพบ ${state.tracks.length} เพลง`);
-    } catch (error) { status(`ผิดพลาด: ${error.message}`); }
-  }
-  async function saveTrack(index) {
-    try {
-      const name = prompt('ชื่อ Playlist', 'My AudioVibe Playlist');
-      if (!name) return;
-      const userId = $('userId').value;
-      const playlists = await api(`/playlists?userId=${encodeURIComponent(userId)}`);
-      let playlist = playlists.find((item) => item.name === name);
-      if (!playlist) playlist = await api('/playlists', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId, name, isPublic: true }) });
-      await api(`/playlists/${playlist.playlistId || playlist.id}/tracks`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ userId, tracks: [state.tracks[index]] }) });
-      status(`บันทึก ${state.tracks[index].title} แล้ว`);
-    } catch (error) { status(`ผิดพลาด: ${error.message}`); }
-  }
-  async function loadPlaylists() {
-    try { const data = await api(`/playlists?userId=${encodeURIComponent($('userId').value)}`); $('results').innerHTML = data.map((p) => `<article class="track"><div></div><div><strong>${escapeHtml(p.name)}</strong><small>${p.tracks.length} tracks · average features ready</small></div></article>`).join('') || '<div class="muted">ยังไม่มี Playlist</div>'; status(`มี ${data.length} Playlist`); } catch (error) { status(`ผิดพลาด: ${error.message}`); }
-  }
-  function escapeHtml(value) { return String(value).replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char])); }
+  async function api(url, options) { const response = await fetch(url, options); const data = await response.json(); if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`); return data; }
+  async function loadProfile() { try { const profile = await api(`/users/${USER_ID}`); $('profileName').textContent = profile.displayName || 'Spotify user'; $('profileId').textContent = `Spotify: ${profile.spotifyId}`; $('profileImage').src = profile.profileImageUrl || ''; } catch (error) { $('profileName').textContent = 'Spotify account unavailable'; status(`Profile error: ${error.message}`); } }
+  async function searchTracks() { try { const query = $('query').value.trim(); if (!query) return status('กรุณาระบุคำค้นหา'); status('กำลังค้นหาเพลง...'); state.tracks = await api(`/playlists/search?userId=${USER_ID}&query=${encodeURIComponent(query)}&limit=10`); $('results').innerHTML = state.tracks.map((track, index) => `<article class="track"><img src="${esc(track.albumCoverUrl)}" alt=""><div><strong>${esc(track.title)}</strong><small>${esc(track.artistName)} · ${esc(track.albumName)}</small></div><div class="track-actions"><button class="small" onclick="addSearchTrack(${index})">Add</button>${track.previewUrl ? `<audio controls src="${esc(track.previewUrl)}"></audio>` : ''}</div></article>`).join('') || '<div class="empty">ไม่พบเพลง</div>'; status(`พบ ${state.tracks.length} เพลง`); } catch (error) { status(`Search error: ${error.message}`); } }
+  async function loadPlaylists() { try { state.playlists = await api(`/playlists?userId=${USER_ID}`); const select = $('playlistSelect'); select.innerHTML = '<option value="">No playlist selected</option>' + state.playlists.map((p) => `<option value="${p.playlistId}">${esc(p.name)}</option>`).join(''); if (state.selected && state.playlists.some((p) => p.playlistId === state.selected.playlistId)) select.value = state.selected.playlistId; else if (state.playlists[0]) { select.value = state.playlists[0].playlistId; } selectPlaylist(); status(`${state.playlists.length} playlist(s) loaded`); } catch (error) { status(`Playlist error: ${error.message}`); } }
+  async function selectPlaylist() { const id = $('playlistSelect').value; if (!id) { state.selected = null; renderPlaylist(); return; } try { state.selected = await api(`/playlists/${id}?userId=${USER_ID}`); renderPlaylist(); } catch (error) { status(`Playlist error: ${error.message}`); } }
+  function renderPlaylist() { const p = state.selected; $('exportButton').disabled = !p; $('playlistSummary').innerHTML = p ? `<strong>${esc(p.name)}</strong><br><small>${p.tracks.length} track(s) · ${p.isExported ? 'exported' : 'local only'}</small>` : 'เลือก Playlist เพื่อดูรายละเอียด'; $('playlistTracks').innerHTML = p?.tracks?.length ? p.tracks.map((track, index) => `<article class="track"><img src="${esc(track.albumCoverUrl)}" alt=""><div><strong>${esc(track.title)}</strong><small>${esc(track.artistName)}</small></div><div class="track-actions"><button class="small" onclick="moveTrack(${index},-1)">↑</button><button class="small" onclick="moveTrack(${index},1)">↓</button><button class="small danger" onclick="removeTrack('${esc(track.id)}')">Remove</button>${track.previewUrl ? `<audio controls src="${esc(track.previewUrl)}"></audio>` : ''}</div></article>`).join('') : '<div class="empty">ยังไม่มีเพลงใน Playlist</div>'; }
+  async function createPlaylist() { const name = prompt('ชื่อ Playlist', 'My AudioVibe Playlist'); if (!name) return; try { const playlist = await api('/playlists', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId:USER_ID, name, isPublic:true }) }); await loadPlaylists(); $('playlistSelect').value = playlist.id; await selectPlaylist(); status(`สร้าง Playlist ${name} แล้ว`); } catch (error) { status(`Create error: ${error.message}`); } }
+  async function addSearchTrack(index) { if (!state.selected) return status('กรุณาสร้างหรือเลือก Playlist ก่อน'); try { state.selected = await api(`/playlists/${state.selected.playlistId}/tracks`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId:USER_ID, tracks:[state.tracks[index]] }) }); renderPlaylist(); status(`เพิ่ม ${state.tracks[index].title} แล้ว`); } catch (error) { status(`Add error: ${error.message}`); } }
+  async function removeTrack(trackId) { if (!state.selected) return; try { state.selected = await api(`/playlists/${state.selected.playlistId}/tracks/${trackId}?userId=${USER_ID}`, { method:'DELETE' }); renderPlaylist(); status('ลบเพลงแล้ว'); } catch (error) { status(`Remove error: ${error.message}`); } }
+  async function moveTrack(index, direction) { if (!state.selected) return; const tracks = [...state.selected.tracks]; const target = index + direction; if (target < 0 || target >= tracks.length) return; [tracks[index], tracks[target]] = [tracks[target], tracks[index]]; try { state.selected = await api(`/playlists/${state.selected.playlistId}/tracks/order`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId:USER_ID, trackIds:tracks.map((track) => track.id) }) }); renderPlaylist(); } catch (error) { status(`Order error: ${error.message}`); } }
+  async function renamePlaylist() { if (!state.selected) return status('กรุณาเลือก Playlist'); const name = prompt('ชื่อใหม่', state.selected.name); if (!name) return; try { await api(`/playlists/${state.selected.playlistId}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId:USER_ID, name }) }); await loadPlaylists(); status('เปลี่ยนชื่อแล้ว'); } catch (error) { status(`Rename error: ${error.message}`); } }
+  async function deletePlaylist() { if (!state.selected || !confirm(`ลบ ${state.selected.name}?`)) return; try { await api(`/playlists/${state.selected.playlistId}?userId=${USER_ID}`, { method:'DELETE' }); state.selected = null; await loadPlaylists(); status('ลบ Playlist แล้ว'); } catch (error) { status(`Delete error: ${error.message}`); } }
+  async function exportPlaylist() { if (!state.selected) return; try { status('กำลัง Export ไป Spotify...'); const result = await api('/playlists/export', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ userId:USER_ID, playlistId:state.selected.playlistId, name:state.selected.name, isPublic:state.selected.isPublic, trackIds:state.selected.tracks.map((track) => track.id) }) }); state.selected.isExported = true; renderPlaylist(); status(`Export สำเร็จ: ${result.spotifyPlaylistId}`); } catch (error) { status(`Export ไม่สำเร็จ: ${error.message}`); } }
+  loadProfile(); loadPlaylists();
 </script>
 </body>
 </html>

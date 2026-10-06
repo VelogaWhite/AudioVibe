@@ -42,13 +42,12 @@ export class SpotifyApiClient {
   }
 
   async createSpotifyPlaylist(
-    userId: string,
     name: string,
     isPublic: boolean,
     accessToken: string,
   ): Promise<{ id: string }> {
     return this.request(
-      `/users/${encodeURIComponent(userId)}/playlists`,
+      '/me/playlists',
       accessToken,
       {
         method: 'POST',

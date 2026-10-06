@@ -13,6 +13,27 @@ export class SpotifyTokenService {
     private readonly redisService: RedisService,
   ) {}
 
+  async cacheAccessToken(
+    userId: string,
+    accessToken: string,
+    refreshToken: string,
+    expiresInSeconds: number,
+  ) {
+    const tokenExpiresAt = new Date(
+      Date.now() + expiresInSeconds * 1000,
+    );
+    await this.redisService.getClient().set(
+      `user:token:${userId}`,
+      JSON.stringify({
+        accessToken,
+        refreshToken,
+        tokenExpiresAt: tokenExpiresAt.toISOString(),
+      }),
+      'EX',
+      TOKEN_CACHE_TTL_SECONDS,
+    );
+  }
+
   async refreshUserAccessToken(spotifyId: string) {
     const user = await this.usersService.findBySpotifyId(spotifyId);
 

@@ -25,6 +25,7 @@ export class SpotifyAuthService {
       client_id: this.clientId,
       redirect_uri: this.redirectUri,
       scope: this.scopes.join(' '),
+      show_dialog: 'true',
     });
 
     return `https://accounts.spotify.com/authorize?${params.toString()}`;

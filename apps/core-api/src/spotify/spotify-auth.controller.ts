@@ -2,12 +2,14 @@ import { Controller, Get, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { SpotifyAuthService } from './spotify-auth.service.js';
 import { UsersService } from '../users/users.service.js';
+import { SpotifyTokenService } from './spotify-token.service.js';
 
 @Controller('auth/spotify')
 export class SpotifyAuthController {
   constructor(
     private readonly spotifyAuthService: SpotifyAuthService,
     private readonly usersService: UsersService,
+    private readonly spotifyTokenService: SpotifyTokenService,
   ) {}
 
   @Get('login')
@@ -39,6 +41,13 @@ export class SpotifyAuthController {
         Date.now() + tokenData.expires_in * 1000,
       ),
     });
+
+    await this.spotifyTokenService.cacheAccessToken(
+      user.id,
+      tokenData.access_token,
+      tokenData.refresh_token ?? user.refreshToken,
+      tokenData.expires_in,
+    );
 
     return {
       message: 'Spotify authentication successful',
