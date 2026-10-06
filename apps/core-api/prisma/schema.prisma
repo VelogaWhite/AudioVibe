@@ -1,0 +1,114 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String   @id @default(uuid())
+  spotifyId      String   @unique @map("spotify_id")
+  email          String?  @unique
+  displayName    String?  @map("display_name")
+  profileImageUrl String? @map("profile_image_url")
+  accessToken    String   @map("access_token")
+  refreshToken   String   @map("refresh_token")
+  tokenExpiresAt DateTime @map("token_expires_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  playlists  Playlist[]
+  promptLogs PromptLog[]
+
+  @@map("users")
+}
+
+model PromptLog {
+  id                    String   @id @default(uuid())
+  userId                String   @map("user_id")
+  rawPrompt             String   @map("raw_prompt")
+  isPreset              Boolean  @default(false) @map("is_preset")
+  presetName            String?  @map("preset_name")
+  targetDanceability    Float    @map("target_danceability")
+  targetValence         Float    @map("target_valence")
+  targetEnergy          Float    @map("target_energy")
+  targetAcousticness    Float    @map("target_acousticness")
+  targetInstrumentalness Float   @map("target_instrumentalness")
+  targetLiveness         Float    @map("target_liveness")
+  targetSpeechiness     Float    @map("target_speechiness")
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("prompt_logs")
+}
+
+model Playlist {
+  id               String    @id @default(uuid())
+  userId           String    @map("user_id")
+  spotifyPlaylistId String?  @map("spotify_playlist_id")
+  name             String
+  description      String?
+  isPublic         Boolean   @default(true) @map("is_public")
+  isExported       Boolean   @default(false) @map("is_exported")
+  exportedAt       DateTime? @map("exported_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playlistTracks PlaylistTrack[]
+
+  @@map("playlists")
+}
+
+model Track {
+  id            String   @id
+  title         String
+  artistName    String   @map("artist_name")
+  albumName     String   @map("album_name")
+  albumCoverUrl String   @map("album_cover_url")
+  previewUrl    String?  @map("preview_url")
+  durationMs    Int      @map("duration_ms")
+  popularity    Int      @default(0)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  audioFeature   AudioFeature?
+  playlistTracks PlaylistTrack[]
+
+  @@map("tracks")
+}
+
+model AudioFeature {
+  trackId          String  @id @map("track_id")
+  danceability     Float
+  valence          Float
+  energy           Float
+  acousticness     Float
+  instrumentalness Float
+  liveness         Float
+  speechiness      Float
+  tempo            Float
+  loudness         Float
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@map("audio_features")
+}
+
+model PlaylistTrack {
+  id         String   @id @default(uuid())
+  playlistId String   @map("playlist_id")
+  trackId    String   @map("track_id")
+  order      Int
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  track    Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, trackId])
+  @@map("playlist_tracks")
+}
