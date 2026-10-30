@@ -49,6 +49,7 @@ export class SpotifyAuthController {
       tokenData.expires_in,
     );
 
-    return response.redirect(`/ui?userId=${user.id}`);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://127.0.0.1:3001';
+    return response.redirect(`${frontendUrl}/studio?userId=${user.id}`);
   }
 }

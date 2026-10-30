@@ -63,7 +63,7 @@ export default function UnifiedPlaylistStudioPage() {
 
   // 1. Initial Load: Get userId from URL or LocalStorage
   const loadInitialData = useCallback(async () => {
-    let activeUserId = 'a5d8adf6-3914-47ed-9969-30fad7e10e37';
+    let activeUserId: string | undefined = undefined;
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const paramId = urlParams.get('userId');
@@ -78,13 +78,16 @@ export default function UnifiedPlaylistStudioPage() {
 
     try {
       const profile = await fetchUserProfile(activeUserId);
-      setUser(profile);
-
-      const userPlaylists = await fetchPlaylists(activeUserId);
-      setPlaylists(userPlaylists);
-
-      if (userPlaylists.length > 0) {
-        setPlaylist(userPlaylists[0]);
+      if (profile) {
+        setUser(profile);
+        if (profile.id) {
+          localStorage.setItem('audiovibe_user_id', profile.id);
+          const userPlaylists = await fetchPlaylists(profile.id);
+          setPlaylists(userPlaylists);
+          if (userPlaylists.length > 0) {
+            setPlaylist(userPlaylists[0]);
+          }
+        }
       }
     } catch (err: any) {
       setStatusMessage(`Error: ${err.message}`);

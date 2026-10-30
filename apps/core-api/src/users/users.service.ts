@@ -50,6 +50,12 @@ export class UsersService {
     });
   }
 
+  async findLatest() {
+    return this.prisma.user.findFirst({
+      orderBy: { updatedAt: 'desc' },
+    });
+  }
+
   async findById(id: string) {
     return this.prisma.user.findUnique({
       where: {

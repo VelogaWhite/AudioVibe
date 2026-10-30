@@ -1,26 +1,37 @@
 import { Track, Playlist, AudioFeatures } from '../store/usePlaylistStore';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3000';
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    // Dynamically match hostname (localhost or 127.0.0.1)
+    const host = window.location.hostname;
+    return `http://${host}:3000`;
+  }
+  return 'http://127.0.0.1:3000';
+};
 
-export async function fetchUserProfile(userId: string) {
+export async function fetchUserProfile(userId?: string) {
+  const base = getApiBaseUrl();
   try {
-    const res = await fetch(`${API_BASE_URL}/users/${userId}`);
+    const url = userId ? `${base}/users/${userId}` : `${base}/users/latest/me`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error('User not found');
     return await res.json();
   } catch {
     // Fallback Mock Profile for offline / dev
     return {
-      id: userId,
-      displayName: 'AudioVibe Dev User',
-      spotifyId: 'audiovibe_dev',
-      profileImageUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+      id: userId || '58c016ef-d257-4110-9ec5-018707204218',
+      displayName: 'Yotsudoi',
+      spotifyId: '314h43huivz7rwk72p4emdkg7tmy',
+      profileImageUrl:
+        'https://i.scdn.co/image/ab6775700000ee85480511a23ccdfc3adcb1cf3b',
     };
   }
 }
 
 export async function fetchPlaylists(userId: string): Promise<Playlist[]> {
+  const base = getApiBaseUrl();
   try {
-    const res = await fetch(`${API_BASE_URL}/playlists?userId=${userId}`);
+    const res = await fetch(`${base}/playlists?userId=${userId}`);
     if (!res.ok) throw new Error('Failed to load playlists');
     const data = await res.json();
     return data.map((p: any) => ({
@@ -78,7 +89,8 @@ export async function fetchPlaylists(userId: string): Promise<Playlist[]> {
 }
 
 export async function createPlaylist(userId: string, name: string): Promise<Playlist> {
-  const res = await fetch(`${API_BASE_URL}/playlists`, {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/playlists`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, name, isPublic: true }),
@@ -95,7 +107,8 @@ export async function createPlaylist(userId: string, name: string): Promise<Play
 }
 
 export async function renamePlaylist(userId: string, playlistId: string, name: string) {
-  const res = await fetch(`${API_BASE_URL}/playlists/${playlistId}`, {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/playlists/${playlistId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, name }),
@@ -105,7 +118,8 @@ export async function renamePlaylist(userId: string, playlistId: string, name: s
 }
 
 export async function deletePlaylist(userId: string, playlistId: string) {
-  const res = await fetch(`${API_BASE_URL}/playlists/${playlistId}?userId=${userId}`, {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/playlists/${playlistId}?userId=${userId}`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Delete failed');
@@ -113,14 +127,14 @@ export async function deletePlaylist(userId: string, playlistId: string) {
 }
 
 export async function searchSpotifyTracks(userId: string, query: string, limit = 10): Promise<Track[]> {
+  const base = getApiBaseUrl();
   try {
     const res = await fetch(
-      `${API_BASE_URL}/playlists/search?userId=${userId}&query=${encodeURIComponent(query)}&limit=${limit}`,
+      `${base}/playlists/search?userId=${userId}&query=${encodeURIComponent(query)}&limit=${limit}`,
     );
     if (!res.ok) throw new Error('Search failed');
     return await res.json();
   } catch {
-    // Fallback Mock Tracks if search API / Spotify key isn't reachable
     return [
       {
         id: `search-${Date.now()}-1`,
@@ -147,7 +161,8 @@ export async function exportPlaylistToSpotify(
   isPublic: boolean,
   trackIds: string[],
 ) {
-  const res = await fetch(`${API_BASE_URL}/playlists/export`, {
+  const base = getApiBaseUrl();
+  const res = await fetch(`${base}/playlists/export`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, playlistId, name, isPublic, trackIds }),
@@ -164,19 +179,18 @@ export async function generateAIRecommendations(
   prompt: string,
   presetName?: string,
 ): Promise<{ tracks: Track[]; targetFeatures: AudioFeatures }> {
-  // Try sending to ML recommend endpoint or fallback to simulated AI vector extraction
+  const base = getApiBaseUrl();
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/recommend`, {
+    const res = await fetch(`${base}/api/v1/recommend`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, prompt, presetName }),
     });
     if (res.ok) return await res.json();
   } catch {
-    // Fallback to simulated AI response
+    // Fallback
   }
 
-  // Simulated AI 7-dimensional vector extraction based on mood
   const isHighEnergy = /มัน|เต้น|เร็ว|rock|dance/i.test(prompt);
   const isSad = /เหงา|เศร้า|ร้องไห้|sad/i.test(prompt);
   const isChill = /ผ่อนคลาย|ชิล|สบาย|chill/i.test(prompt);
