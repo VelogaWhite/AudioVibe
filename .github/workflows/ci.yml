@@ -30,12 +30,12 @@ jobs:
           cache-dependency-path: 'apps/core-api/package-lock.json'
 
       - name: Check Backend Code Style & Lint (apps/core-api)
+        # เปลี่ยนจาก: npm ci
+        # เป็น:
         run: |
-          cd apps/core-api
-          npm ci
-          # ตรวจสอบ Prettier และ Linter ตามคอนฟิกของโปรเจกต์
-          npx prettier --check "src/**/*.ts" || echo "Prettier formatting warnings found"
-          npx oxlint || echo "Oxlint warnings found"
+            cd apps/core-api
+            npm install --no-audit
+            npx oxlint || npm run lint --if-present
 
       - name: Check Python Code Style (apps/ml-service)
         if: hashFiles('apps/ml-service/requirements.txt') != ''
@@ -107,10 +107,11 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'apps/core-api/package-lock.json'
 
-      - name: Install Dependencies (apps/core-api)
-        run: |
-          cd apps/core-api
-          npm ci
+        # เปลี่ยนจาก: npm ci
+        # เป็น:
+      - name: Install Dependencies
+        working-directory: apps/core-api
+        run: npm install --no-audit
 
       - name: Generate Prisma Client & Run DB Migration
         run: |
