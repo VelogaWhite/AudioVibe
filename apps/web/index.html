@@ -10,10 +10,11 @@
     main { max-width: 1180px; margin: auto; padding: 28px 18px 60px; } h1 { margin: 0 0 4px; } h2 { margin: 0 0 14px; font-size: 19px; }
     .muted, small { color: #9eb7a8; } .layout { display: grid; grid-template-columns: 320px 1fr; gap: 18px; margin-top: 22px; }
     .card { background: #152019ee; border: 1px solid #2c4a39; border-radius: 16px; padding: 17px; box-shadow: 0 12px 35px #0004; }
-    .profile { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; } .profile img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; background: #2a4435; }
+    .profile { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; } .profile img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; background: #2a4435; }
     .profile strong { display: block; font-size: 17px; } label { display: block; margin: 11px 0 5px; color: #a9c9b5; font-size: 13px; }
     input, select, button { width: 100%; border: 1px solid #41664e; border-radius: 9px; padding: 10px; background: #0d1711; color: inherit; }
     button { margin-top: 10px; border: 0; background: #1ed760; color: #06140a; font-weight: 700; cursor: pointer; } button.secondary { background: #294536; color: #eaf5ee; }
+   
     button.danger { background: #753d3d; color: #fff0f0; } button.small { width: auto; padding: 7px 9px; margin: 0; font-size: 12px; }
     .status { margin-top: 13px; padding: 10px; border-radius: 9px; background: #10281c; color: #a9edbd; white-space: pre-wrap; font-size: 13px; }
     .results, .playlist-tracks { display: grid; gap: 10px; } .track { display: grid; grid-template-columns: 58px 1fr auto; gap: 11px; align-items: center; padding: 9px; border-radius: 10px; background: #0f1913; }
@@ -46,7 +47,11 @@
   </div>
 </main>
 <script>
-  const USER_ID = 'a5d8adf6-3914-47ed-9969-30fad7e10e37';
+  const urlParams = new URLSearchParams(window.location.search);
+  let USER_ID = urlParams.get('userId') || localStorage.getItem('audiovibe_user_id') || 'a5d8adf6-3914-47ed-9969-30fad7e10e37';
+  if (urlParams.get('userId')) {
+    localStorage.setItem('audiovibe_user_id', urlParams.get('userId'));
+  }
   const state = { tracks: [], playlists: [], selected: null };
   const $ = (id) => document.getElementById(id);
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));

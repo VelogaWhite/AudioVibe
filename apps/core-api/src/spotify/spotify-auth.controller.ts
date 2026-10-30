@@ -21,7 +21,7 @@ export class SpotifyAuthController {
   }
 
   @Get('callback')
-  async callback(@Query('code') code: string) {
+  async callback(@Query('code') code: string, @Res() response: Response) {
     const tokenData =
       await this.spotifyAuthService.exchangeCodeForToken(code);
 
@@ -49,12 +49,6 @@ export class SpotifyAuthController {
       tokenData.expires_in,
     );
 
-    return {
-      message: 'Spotify authentication successful',
-      userId: user.id,
-      spotifyId: user.spotifyId,
-      displayName: user.displayName,
-      email: user.email,
-    };
+    return response.redirect(`/ui?userId=${user.id}`);
   }
 }
