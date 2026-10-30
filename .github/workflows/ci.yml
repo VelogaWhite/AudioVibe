@@ -1,14 +1,11 @@
-name: AudioVibe CI/CD Quality Pipeline
+name: AudioVibe CI/CD Quality Gate
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [ main, develop ]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ main, develop, 'feat/**', 'feat/*' ] # เพิ่มให้ครอบคลุมกิ่ง feat
+  workflow_dispatch: # เพิ่มปุ่มกด Run workflow เองจากหน้าเว็บ
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
