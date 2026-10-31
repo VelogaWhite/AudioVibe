@@ -243,11 +243,58 @@ export default function UnifiedPlaylistStudioPage() {
       const result = await generateAIRecommendations(user.id, promptText, presetLabel);
       setAiFeatures(result.targetFeatures);
 
-      // Create new playlist for AI result
+      // Create or locate playlist title for AI result
       const playlistTitle = presetLabel
         ? `Vibe: ${presetLabel}`
         : `AI Vibe: ${promptText.slice(0, 18)}...`;
 
+      // Check if an AI playlist with this exact title already exists
+      const existingPlaylistIndex = playlists.findIndex(
+        (p) => p.name.trim().toLowerCase() === playlistTitle.trim().toLowerCase(),
+      );
+
+      if (existingPlaylistIndex !== -1) {
+        const existing = playlists[existingPlaylistIndex];
+
+        // Check if tracks are identical (matching by title & artist name)
+        const isIdenticalTracks =
+          existing.tracks.length === result.tracks.length &&
+          existing.tracks.every((t, idx) => {
+            const newT = result.tracks[idx];
+            return (
+              newT &&
+              t.title.trim().toLowerCase() === newT.title.trim().toLowerCase() &&
+              t.artistName.trim().toLowerCase() === newT.artistName.trim().toLowerCase()
+            );
+          });
+
+        if (isIdenticalTracks) {
+          // If name and tracks are already the same, do NOT create a duplicate! Just select it
+          setPlaylist(existing);
+          setMode('AI_ANALYTICS');
+          setStatusMessage(
+            `ใช้งานเพลย์ลิสต์ "${playlistTitle}" เดิม (${result.tracks.length} เพลง) ไม่สร้างซ้ำ`,
+          );
+          return;
+        } else {
+          // If name matches but tracks changed, update the existing playlist in-place
+          const updatedPlaylist = {
+            ...existing,
+            tracks: result.tracks,
+          };
+          const updatedList = [...playlists];
+          updatedList[existingPlaylistIndex] = updatedPlaylist;
+          setPlaylists(updatedList);
+          setPlaylist(updatedPlaylist);
+          setMode('AI_ANALYTICS');
+          setStatusMessage(
+            `อัปเดตเพลงใน "${playlistTitle}" สำเร็จ (${result.tracks.length} เพลง)`,
+          );
+          return;
+        }
+      }
+
+      // If playlist doesn't exist yet, create a new one
       const aiPlaylist = {
         id: `ai-${Date.now()}`,
         name: playlistTitle,
