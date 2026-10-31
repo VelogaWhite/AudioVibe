@@ -32,12 +32,14 @@ export interface Playlist {
 }
 
 export type DisplayMode = 'AI_ANALYTICS' | 'MANUAL_MANAGER';
+export type ThemeVibe = 'NATURE' | 'LOVE';
 
 interface PlaylistState {
   currentPlaylist: Playlist | null;
   playlists: Playlist[];
   tracks: Track[];
   displayMode: DisplayMode;
+  themeVibe: ThemeVibe;
   isLoading: boolean;
   error: string | null;
   exportModalOpen: boolean;
@@ -47,6 +49,7 @@ interface PlaylistState {
   setPlaylist: (playlist: Playlist | null) => void;
   setPlaylists: (playlists: Playlist[]) => void;
   setMode: (mode: DisplayMode) => void;
+  setThemeVibe: (theme: ThemeVibe) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   setExportModalOpen: (open: boolean, spotifyPlaylistId?: string | null) => void;
@@ -106,6 +109,7 @@ export const usePlaylistStore = create<PlaylistState>((set) => ({
   playlists: [initialPlaylist],
   tracks: initialTracks,
   displayMode: 'MANUAL_MANAGER',
+  themeVibe: 'NATURE',
   isLoading: false,
   error: null,
   exportModalOpen: false,
@@ -120,6 +124,8 @@ export const usePlaylistStore = create<PlaylistState>((set) => ({
   setPlaylists: (playlists) => set({ playlists }),
 
   setMode: (mode) => set({ displayMode: mode }),
+
+  setThemeVibe: (theme) => set({ themeVibe: theme }),
 
   setLoading: (isLoading) => set({ isLoading }),
 

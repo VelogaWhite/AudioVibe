@@ -3,15 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { Music, Sparkles, Disc, Radio, ArrowRight } from 'lucide-react';
+import { BackgroundVibe } from '../components/BackgroundVibe';
 
 export default function LandingPage() {
   const spotifyLoginUrl = 'http://127.0.0.1:3000/auth/spotify/login';
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background ambient glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#1ed760]/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-[#125835]/20 rounded-full blur-3xl pointer-events-none" />
+      {/* Background botanical foliage, vines and flowers */}
+      <BackgroundVibe theme="NATURE" />
 
       <div className="relative z-10 max-w-xl w-full text-center flex flex-col items-center">
         {/* Animated Brand Badge */}
