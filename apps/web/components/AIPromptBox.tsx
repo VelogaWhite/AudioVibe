@@ -46,9 +46,6 @@ export function AIPromptBox({ onGenerate, isLoading = false }: AIPromptBoxProps)
         <h2 className="text-base font-bold text-white tracking-wide">
           AI Smart Recommend
         </h2>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-[#1b3b29] text-[#1ed760] font-medium border border-[#1ed760]/20">
-          NLP · 7-Axis Audio
-        </span>
         {isLoading && (
           <span className="text-xs text-[#7bc99a] animate-pulse ml-auto">
             กำลังวิเคราะห์อารมณ์...

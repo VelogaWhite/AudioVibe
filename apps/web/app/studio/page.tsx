@@ -402,15 +402,6 @@ export default function UnifiedPlaylistStudioPage() {
             </div>
           </div>
         </div>
-
-        {/* Status Indicator (กิมมิคการเปลี่ยนพื้นหลังจะเกิดขึ้นอัตโนมัติเมื่อสั่ง AI) */}
-        <div className="flex items-center gap-3">
-          {statusMessage && (
-            <span className="text-xs text-[#a3d8b5] bg-[#12271c] border border-[#204732] px-3 py-1 rounded-full animate-fade-in">
-              {statusMessage}
-            </span>
-          )}
-        </div>
       </header>
 
       {/* Main 2-Column Responsive Workspace */}
