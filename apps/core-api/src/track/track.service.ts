@@ -15,7 +15,6 @@ export class TrackService {
         artistName: track.artistName,
         albumName: track.albumName,
         albumCoverUrl: track.albumCoverUrl,
-        previewUrl: track.previewUrl,
         durationMs: track.durationMs,
         popularity: track.popularity,
       },
@@ -24,7 +23,6 @@ export class TrackService {
         artistName: track.artistName,
         albumName: track.albumName,
         albumCoverUrl: track.albumCoverUrl,
-        previewUrl: track.previewUrl,
         durationMs: track.durationMs,
         popularity: track.popularity,
       },
@@ -45,7 +43,6 @@ export class TrackService {
     dto.artistName = track.artistName;
     dto.albumName = track.albumName;
     dto.albumCoverUrl = track.albumCoverUrl;
-    dto.previewUrl = track.previewUrl;
     dto.durationMs = track.durationMs;
     dto.popularity = track.popularity;
     dto.audioFeatures = track.audioFeature ?? null;

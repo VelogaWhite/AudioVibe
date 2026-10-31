@@ -1,7 +1,6 @@
 import {
   IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   Min,
@@ -30,10 +29,6 @@ export class TrackDTO {
   @IsString()
   @IsNotEmpty()
   albumCoverUrl: string;
-
-  @IsOptional()
-  @IsString()
-  previewUrl: string | null;
 
   @IsInt()
   @Min(0)

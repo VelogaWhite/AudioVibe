@@ -71,7 +71,6 @@ model Track {
   artistName    String   @map("artist_name")
   albumName     String   @map("album_name")
   albumCoverUrl String   @map("album_cover_url")
-  previewUrl    String?  @map("preview_url")
   durationMs    Int      @map("duration_ms")
   popularity    Int      @default(0)
   createdAt     DateTime @default(now()) @map("created_at")

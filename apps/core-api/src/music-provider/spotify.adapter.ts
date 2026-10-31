@@ -128,7 +128,6 @@ async searchTracks(
     dto.artistName = artist;
     dto.albumName = String(album.name ?? 'Unknown album');
     dto.albumCoverUrl = String(album.images?.[0]?.url ?? '');
-    dto.previewUrl = source.preview_url ?? null;
     dto.durationMs = Number(source.duration_ms ?? 0);
     dto.popularity = Number(source.popularity ?? 0);
     return dto;

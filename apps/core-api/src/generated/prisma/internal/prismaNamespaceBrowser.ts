@@ -132,7 +132,6 @@ export const TrackScalarFieldEnum = {
   artistName: 'artistName',
   albumName: 'albumName',
   albumCoverUrl: 'albumCoverUrl',
-  previewUrl: 'previewUrl',
   durationMs: 'durationMs',
   popularity: 'popularity',
   createdAt: 'createdAt'
