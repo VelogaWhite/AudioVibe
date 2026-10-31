@@ -1,5 +1,13 @@
 import type { Metadata } from 'next';
+import { Prompt } from 'next/font/google';
 import './globals.css';
+
+const promptFont = Prompt({
+  weight: ['300', '400', '500', '600', '700', '800'],
+  subsets: ['thai', 'latin'],
+  display: 'swap',
+  variable: '--font-prompt',
+});
 
 export const metadata: Metadata = {
   title: 'AudioVibe — Intelligent Music Playlist Generator',
@@ -13,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#070d0a] text-[#eef8f2] antialiased">
+    <html lang="th" className={`dark ${promptFont.variable}`}>
+      <body className={`${promptFont.className} min-h-screen bg-[#070d0a] text-[#eef8f2] antialiased`}>
         {children}
       </body>
     </html>
