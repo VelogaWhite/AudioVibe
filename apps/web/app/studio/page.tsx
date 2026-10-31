@@ -204,13 +204,29 @@ export default function UnifiedPlaylistStudioPage() {
     setIsGenerating(true);
     setStatusMessage('กำลังวิเคราะห์อารมณ์และสกัด 7 มิติเสียงด้วย AI...');
 
-    // Dynamic Theme Switching: Love vibe turns dark pink + hearts, others stay nature
+    // Dynamic Theme Switching (Gimmick):
+    // 1. Love mood -> LOVE (Dark Pink, Hearts)
+    // 2. Sad / Rainy mood -> RAINY (Moody Blue, Rain Clouds & Falling Rain)
+    // 3. High Energy mood -> FIRE (Dark Red-Orange, Flames & Ember Sparks)
+    // 4. Default / Chill -> NATURE (Dark Green, Vines, Leaves & Flowers)
     const isLoveMood =
       presetLabel?.includes('รัก') ||
       /รัก|คลั่งรัก|แฟน|love|romantic|หัวใจ|หวาน|วาเลนไทน์|in love/i.test(promptText);
 
+    const isRainyMood =
+      presetLabel?.includes('เหงา') ||
+      /เหงา|เศร้า|ร้องไห้|sad|alone|อกหัก|ฝน|rain|คิดถึง|depress/i.test(promptText);
+
+    const isFireMood =
+      presetLabel?.includes('มัน') ||
+      /มัน|ตื๊ด|เต้น|เร็ว|rock|dance|club|party|ไฟ|fire|เบสหนัก|สุดเหวี่ยง|สนุก/i.test(promptText);
+
     if (isLoveMood) {
       setThemeVibe('LOVE');
+    } else if (isRainyMood) {
+      setThemeVibe('RAINY');
+    } else if (isFireMood) {
+      setThemeVibe('FIRE');
     } else {
       setThemeVibe('NATURE');
     }

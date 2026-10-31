@@ -32,7 +32,7 @@ export interface Playlist {
 }
 
 export type DisplayMode = 'AI_ANALYTICS' | 'MANUAL_MANAGER';
-export type ThemeVibe = 'NATURE' | 'LOVE';
+export type ThemeVibe = 'NATURE' | 'LOVE' | 'RAINY' | 'FIRE';
 
 interface PlaylistState {
   currentPlaylist: Playlist | null;
