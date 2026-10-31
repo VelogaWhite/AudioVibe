@@ -1,0 +1,79 @@
+import { BadRequestException, Controller, Get, Post, Query, Res } from '@nestjs/common';
+import type { Response } from 'express';
+import { SpotifyAuthService } from './spotify-auth.service.js';
+import { UsersService } from '../users/users.service.js';
+import { SpotifyTokenService } from './spotify-token.service.js';
+
+@Controller('auth/spotify')
+export class SpotifyAuthController {
+  constructor(
+    private readonly spotifyAuthService: SpotifyAuthService,
+    private readonly usersService: UsersService,
+    private readonly spotifyTokenService: SpotifyTokenService,
+  ) {}
+
+  @Get('login')
+  async login(@Res() response: Response) {
+    const authorizationUrl =
+      await this.spotifyAuthService.getAuthorizationUrl();
+
+    return response.redirect(authorizationUrl);
+  }
+
+  @Get('callback')
+  async callback(@Query('code') code: string, @Query('state') state: string) {
+    const validState = await this.spotifyAuthService.consumeAuthorizationState(state);
+    if (!validState) {
+      throw new BadRequestException('Invalid or expired Spotify OAuth state');
+    }
+
+    if (!code) {
+      throw new BadRequestException('Spotify authorization code is required');
+    }
+
+    const tokenData =
+      await this.spotifyAuthService.exchangeCodeForToken(code);
+
+    const profile =
+      await this.spotifyAuthService.getCurrentUserProfile(
+        tokenData.access_token,
+      );
+
+    const user = await this.usersService.findOrCreateUser({
+      spotifyId: profile.id,
+      email: profile.email ?? null,
+      displayName: profile.display_name ?? null,
+      profileImageUrl: profile.images?.[0]?.url ?? null,
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      tokenExpiresAt: new Date(
+        Date.now() + tokenData.expires_in * 1000,
+      ),
+    });
+
+    await this.spotifyTokenService.cacheAccessToken(
+      user.id,
+      tokenData.access_token,
+      tokenData.refresh_token ?? user.refreshToken,
+      tokenData.expires_in,
+    );
+
+    return {
+      message: 'Spotify authentication successful',
+      userId: user.id,
+      spotifyId: user.spotifyId,
+      displayName: user.displayName,
+      email: user.email,
+    };
+  }
+
+  @Post('logout')
+  async logout(@Query('userId') userId: string) {
+    if (!userId) {
+      throw new BadRequestException('userId is required');
+    }
+
+    await this.spotifyTokenService.clearCachedAccessToken(userId);
+    return { loggedOut: true, userId };
+  }
+}
