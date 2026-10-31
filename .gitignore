@@ -27,3 +27,5 @@ playwright-report/
 .coverage
 .pytest_cache/
 *.csv
+!apps/ml-service/data/spotify_tracks_cleaned.csv
+!apps/core-api/prisma/data/spotify_tracks_cleaned.csv
