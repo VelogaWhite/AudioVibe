@@ -24,3 +24,6 @@ playwright-report/
 .DS_Store
 .vscode/
 .idea/
+.coverage
+.pytest_cache/
+*.csv
