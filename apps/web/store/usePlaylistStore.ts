@@ -53,10 +53,55 @@ interface PlaylistState {
   reorderTracks: (startIndex: number, endIndex: number) => void;
 }
 
+const initialTracks: Track[] = [
+  {
+    id: 'track-init-1',
+    title: 'Midnight Coffee',
+    artistName: 'Lofi Chilled',
+    albumName: 'Night Beats Vol. 1',
+    albumCoverUrl:
+      'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+    audioFeatures: {
+      danceability: 0.65,
+      valence: 0.55,
+      energy: 0.45,
+      acousticness: 0.75,
+      instrumentalness: 0.85,
+      liveness: 0.2,
+      speechiness: 0.05,
+    },
+  },
+  {
+    id: 'track-init-2',
+    title: 'Neon Rainy Walk',
+    artistName: 'Urban Synth',
+    albumName: 'City Lights',
+    albumCoverUrl:
+      'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120',
+    audioFeatures: {
+      danceability: 0.72,
+      valence: 0.6,
+      energy: 0.68,
+      acousticness: 0.35,
+      instrumentalness: 0.4,
+      liveness: 0.3,
+      speechiness: 0.08,
+    },
+  },
+];
+
+const initialPlaylist: Playlist = {
+  id: 'my-vibe-playlist',
+  name: '🎧 My Focus Beats',
+  isPublic: true,
+  isExported: false,
+  tracks: initialTracks,
+};
+
 export const usePlaylistStore = create<PlaylistState>((set) => ({
-  currentPlaylist: null,
-  playlists: [],
-  tracks: [],
+  currentPlaylist: initialPlaylist,
+  playlists: [initialPlaylist],
+  tracks: initialTracks,
   displayMode: 'MANUAL_MANAGER',
   isLoading: false,
   error: null,
@@ -82,7 +127,6 @@ export const usePlaylistStore = create<PlaylistState>((set) => ({
 
   addTrack: (track) =>
     set((state) => {
-      // Adding manually switches mode to MANUAL_MANAGER per spec!
       const updatedTracks = [...state.tracks, track];
       const updatedPlaylist = state.currentPlaylist
         ? { ...state.currentPlaylist, tracks: updatedTracks }
