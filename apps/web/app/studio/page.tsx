@@ -9,8 +9,6 @@ import {
   ListMusic,
   Sparkles,
   ArrowLeft,
-  Heart,
-  Leaf,
 } from 'lucide-react';
 import {
   usePlaylistStore,
@@ -308,19 +306,13 @@ export default function UnifiedPlaylistStudioPage() {
     );
   }
 
-  const isLove = themeVibe === 'LOVE';
-
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col relative transition-colors duration-700">
       {/* Decorative Dynamic Background (Nature vines/flowers vs Love dark pink/hearts) */}
       <BackgroundVibe theme={themeVibe} />
 
       {/* Top Navbar */}
-      <header
-        className={`flex flex-wrap items-center justify-between gap-4 pb-6 mb-6 border-b transition-colors duration-500 ${
-          isLove ? 'border-[#4a152d]' : 'border-[#1b3a2a]'
-        }`}
-      >
+      <header className="flex items-center justify-between pb-6 mb-6 border-b border-[#1b3a2a]">
         <div className="flex items-center gap-3">
           <Link
             href="/"
@@ -329,83 +321,22 @@ export default function UnifiedPlaylistStudioPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2.5">
-            <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center shadow transition-all duration-500 ${
-                isLove
-                  ? 'bg-gradient-to-br from-[#ff2a7a] to-[#881337] shadow-[#ff2a7a]/20'
-                  : 'bg-gradient-to-br from-[#1ed760] to-[#0f6832] shadow-[#1ed760]/20'
-              }`}
-            >
-              {isLove ? (
-                <Heart className="w-5 h-5 text-white fill-white" />
-              ) : (
-                <Music className="w-5 h-5 text-[#05160b]" />
-              )}
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1ed760] to-[#0f6832] flex items-center justify-center shadow shadow-[#1ed760]/20">
+              <Music className="w-5 h-5 text-[#05160b]" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold text-white tracking-tight">
-                Audio
-                <span
-                  className={`transition-colors duration-500 ${
-                    isLove ? 'text-[#ff4d8d]' : 'text-[#1ed760]'
-                  }`}
-                >
-                  Vibe
-                </span>{' '}
-                Studio
+                Audio<span className="text-[#1ed760]">Vibe</span> Studio
               </h1>
               <p className="text-[11px] text-[#86a894]">Unified Playlist Workspace V2</p>
             </div>
           </div>
         </div>
 
-        {/* Right Header Area: Background Theme Switcher + Status Indicator */}
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Quick Theme Switcher Pill (ให้ผู้ใช้ลองสลับพื้นหลังได้ทันที) */}
-          <div
-            className={`flex items-center p-1 rounded-xl border transition-colors duration-500 ${
-              isLove
-                ? 'bg-[#1e0713]/80 border-[#4a152d]'
-                : 'bg-[#0f2117]/80 border-[#1f422e]'
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => setThemeVibe('NATURE')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                !isLove
-                  ? 'bg-[#1ed760] text-[#06140a] shadow-sm'
-                  : 'text-[#84a390] hover:text-white hover:bg-[#1a3826]/50'
-              }`}
-              title="พื้นหลังธรรมชาติ (ต้นไม้ เถาวัลย์เลื้อยไม้ ดอกไม้)"
-            >
-              <Leaf className="w-3.5 h-3.5" />
-              <span>ธรรมชาติ</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setThemeVibe('LOVE')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-300 ${
-                isLove
-                  ? 'bg-[#ff2a7a] text-white shadow-sm shadow-[#ff2a7a]/30'
-                  : 'text-[#84a390] hover:text-[#ffaed6] hover:bg-[#3d1326]/50'
-              }`}
-              title="พื้นหลังเพลงรัก (โทนชมพูมืด ลวดลายหัวใจ)"
-            >
-              <Heart className="w-3.5 h-3.5 fill-current" />
-              <span>เพลงรัก</span>
-            </button>
-          </div>
-
-          {/* Status Indicator */}
+        {/* Status Indicator (กิมมิคการเปลี่ยนพื้นหลังจะเกิดขึ้นอัตโนมัติเมื่อสั่ง AI) */}
+        <div className="flex items-center gap-3">
           {statusMessage && (
-            <span
-              className={`text-xs px-3 py-1 rounded-full border transition-all duration-500 ${
-                isLove
-                  ? 'text-[#ffaed6] bg-[#220716] border-[#4a152d]'
-                  : 'text-[#a3d8b5] bg-[#12271c] border-[#204732]'
-              }`}
-            >
+            <span className="text-xs text-[#a3d8b5] bg-[#12271c] border border-[#204732] px-3 py-1 rounded-full animate-fade-in">
               {statusMessage}
             </span>
           )}
