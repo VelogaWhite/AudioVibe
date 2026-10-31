@@ -6,8 +6,8 @@ type SpotifySearchResponse = {
   };
 };
 
-type SpotifyAudioFeaturesResponse = {
-  audio_features?: Array<Record<string, unknown> | null>;
+type SpotifyTracksResponse = {
+  tracks?: Array<Record<string, unknown> | null>;
 };
 
 @Injectable()
@@ -76,29 +76,31 @@ export class SpotifyApiClient {
     );
   }
 
-  async fetchAudioFeatures(trackIds: string[], accessToken: string) {
+  async fetchTracksMetadata(trackIds: string[], accessToken: string) {
     if (trackIds.length === 0) {
       return [];
     }
 
     const ids = trackIds.map(encodeURIComponent).join(',');
 
-    const response = await this.request<SpotifyAudioFeaturesResponse>(
-      `/audio-features?ids=${ids}`,
+    const response = await this.request<SpotifyTracksResponse>(
+      `/tracks?ids=${ids}`,
       accessToken,
     );
-    return response.audio_features ?? [];
+    return response.tracks ?? [];
   }
 
   async searchTracks(
     query: string,
     limit: number,
     accessToken: string,
+    offset = 0,
   ) {
     const params = new URLSearchParams({
       q: query,
       type: 'track',
       limit: String(limit),
+      offset: String(offset),
     });
 
     const response = await this.request<SpotifySearchResponse>(

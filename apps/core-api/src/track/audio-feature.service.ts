@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { RedisService } from '../redis/redis.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { SpotifyAdapter } from '../music-provider/spotify.adapter.js';
 
 const FEATURES_CACHE_TTL_SECONDS = 7 * 24 * 60 * 60;
 
@@ -10,10 +9,9 @@ export class AudioFeatureService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly redisService: RedisService,
-    private readonly spotifyAdapter: SpotifyAdapter,
   ) {}
 
-  async getForTracks(userId: string, trackIds: string[]) {
+  async getForTracks(_userId: string, trackIds: string[]) {
     const redis = this.redisService.getClient();
     const result = new Map<string, any>();
     const missing: string[] = [];
@@ -28,16 +26,10 @@ export class AudioFeatureService {
     }
 
     if (missing.length > 0) {
-      const features = await this.spotifyAdapter.getAudioFeatures(
-        userId,
-        missing,
-      );
+      const features = await this.prisma.audioFeature.findMany({
+        where: { trackId: { in: missing } },
+      });
       for (const feature of features) {
-        await this.prisma.audioFeature.upsert({
-          where: { trackId: feature.trackId },
-          create: feature,
-          update: feature,
-        });
         await redis.set(
           `track:features:${feature.trackId}`,
           JSON.stringify(feature),

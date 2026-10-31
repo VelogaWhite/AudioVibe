@@ -1,14 +1,11 @@
-export type AudioFeaturesData = {
-  trackId: string;
-  danceability: number;
-  valence: number;
-  energy: number;
-  acousticness: number;
-  instrumentalness: number;
-  liveness: number;
-  speechiness: number;
-  tempo: number;
-  loudness: number;
+export type SpotifyTrackMetadata = {
+  id: string;
+  title: string;
+  artistName: string;
+  albumName: string | null;
+  albumCoverUrl: string | null;
+  durationMs: number;
+  popularity: number;
 };
 
 export interface IMusicProviderAdapter {
@@ -24,14 +21,15 @@ export interface IMusicProviderAdapter {
     trackIds: string[],
   ): Promise<boolean>;
 
-  getAudioFeatures(
+  getTracksMetadata(
     userId: string,
     trackIds: string[],
-  ): Promise<AudioFeaturesData[]>;
+  ): Promise<SpotifyTrackMetadata[]>;
 
   searchTracks(
     userId: string,
     query: string,
     limit: number,
+    offset?: number,
   ): Promise<unknown[]>;
 }

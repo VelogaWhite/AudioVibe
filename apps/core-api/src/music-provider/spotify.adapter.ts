@@ -3,7 +3,7 @@ import { TrackDTO } from '../dto/track.dto.js';
 import { UsersService } from '../users/users.service.js';
 import { SpotifyTokenService } from '../spotify/spotify-token.service.js';
 import {
-  AudioFeaturesData,
+  SpotifyTrackMetadata,
   IMusicProviderAdapter,
 } from './music-provider.adapter.js';
 import { SpotifyApiClient } from './spotify-api.client.js';
@@ -48,30 +48,32 @@ export class SpotifyAdapter implements IMusicProviderAdapter {
     return true;
   }
 
-  async getAudioFeatures(
+  async getTracksMetadata(
     userId: string,
     trackIds: string[],
-  ): Promise<AudioFeaturesData[]> {
+  ): Promise<SpotifyTrackMetadata[]> {
     const user = await this.usersService.findById(userId);
     if (!user) throw new Error('User not found');
     const accessToken = await this.spotifyTokenService.getValidAccessToken(userId);
-    const response = await this.spotifyApiClient.fetchAudioFeatures(
+    const response = await this.spotifyApiClient.fetchTracksMetadata(
       trackIds,
       accessToken,
     );
-    return response.flatMap((feature) => {
-      if (!feature || typeof feature.id !== 'string') return [];
+    return response.flatMap((track) => {
+      if (!track || typeof track.id !== 'string') return [];
+      const album = (track.album ?? {}) as Record<string, unknown>;
+      const artists = Array.isArray(track.artists) ? track.artists : [];
+      const artist = artists[0] as Record<string, unknown> | undefined;
+      const images = Array.isArray(album.images) ? album.images : [];
+      const image = images[0] as Record<string, unknown> | undefined;
       return [{
-        trackId: feature.id,
-        danceability: Number(feature.danceability ?? 0),
-        valence: Number(feature.valence ?? 0),
-        energy: Number(feature.energy ?? 0),
-        acousticness: Number(feature.acousticness ?? 0),
-        instrumentalness: Number(feature.instrumentalness ?? 0),
-        liveness: Number(feature.liveness ?? 0),
-        speechiness: Number(feature.speechiness ?? 0),
-        tempo: Number(feature.tempo ?? 0),
-        loudness: Number(feature.loudness ?? 0),
+        id: track.id,
+        title: String(track.name ?? 'Unknown track'),
+        artistName: String(artist?.name ?? 'Unknown artist'),
+        albumName: typeof album.name === 'string' ? album.name : null,
+        albumCoverUrl: typeof image?.url === 'string' ? image.url : null,
+        durationMs: Number(track.duration_ms ?? 0),
+        popularity: Number(track.popularity ?? 0),
       }];
     });
   }
@@ -80,6 +82,7 @@ async searchTracks(
   userId: string,
   query: string,
   limit: number,
+  offset = 0,
 ): Promise<TrackDTO[]> {
   const user = await this.usersService.findById(userId);
 
@@ -94,6 +97,7 @@ async searchTracks(
     query,
     limit,
     accessToken,
+    offset,
     ) as unknown;
 
     if (Array.isArray(response)) {
@@ -126,9 +130,8 @@ async searchTracks(
     dto.id = String(source.id);
     dto.title = String(source.name ?? 'Unknown track');
     dto.artistName = artist;
-    dto.albumName = String(album.name ?? 'Unknown album');
-    dto.albumCoverUrl = String(album.images?.[0]?.url ?? '');
-    dto.previewUrl = source.preview_url ?? null;
+    dto.albumName = typeof album.name === 'string' ? album.name : null;
+    dto.albumCoverUrl = typeof album.images?.[0]?.url === 'string' ? album.images[0].url : null;
     dto.durationMs = Number(source.duration_ms ?? 0);
     dto.popularity = Number(source.popularity ?? 0);
     return dto;

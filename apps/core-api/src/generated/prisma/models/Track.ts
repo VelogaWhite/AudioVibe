@@ -42,7 +42,6 @@ export type TrackMinAggregateOutputType = {
   artistName: string | null
   albumName: string | null
   albumCoverUrl: string | null
-  previewUrl: string | null
   durationMs: number | null
   popularity: number | null
   createdAt: Date | null
@@ -54,7 +53,6 @@ export type TrackMaxAggregateOutputType = {
   artistName: string | null
   albumName: string | null
   albumCoverUrl: string | null
-  previewUrl: string | null
   durationMs: number | null
   popularity: number | null
   createdAt: Date | null
@@ -66,7 +64,6 @@ export type TrackCountAggregateOutputType = {
   artistName: number
   albumName: number
   albumCoverUrl: number
-  previewUrl: number
   durationMs: number
   popularity: number
   createdAt: number
@@ -90,7 +87,6 @@ export type TrackMinAggregateInputType = {
   artistName?: true
   albumName?: true
   albumCoverUrl?: true
-  previewUrl?: true
   durationMs?: true
   popularity?: true
   createdAt?: true
@@ -102,7 +98,6 @@ export type TrackMaxAggregateInputType = {
   artistName?: true
   albumName?: true
   albumCoverUrl?: true
-  previewUrl?: true
   durationMs?: true
   popularity?: true
   createdAt?: true
@@ -114,7 +109,6 @@ export type TrackCountAggregateInputType = {
   artistName?: true
   albumName?: true
   albumCoverUrl?: true
-  previewUrl?: true
   durationMs?: true
   popularity?: true
   createdAt?: true
@@ -211,9 +205,8 @@ export type TrackGroupByOutputType = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl: string | null
+  albumName: string | null
+  albumCoverUrl: string | null
   durationMs: number
   popularity: number
   createdAt: Date
@@ -246,9 +239,8 @@ export type TrackWhereInput = {
   id?: Prisma.StringFilter<"Track"> | string
   title?: Prisma.StringFilter<"Track"> | string
   artistName?: Prisma.StringFilter<"Track"> | string
-  albumName?: Prisma.StringFilter<"Track"> | string
-  albumCoverUrl?: Prisma.StringFilter<"Track"> | string
-  previewUrl?: Prisma.StringNullableFilter<"Track"> | string | null
+  albumName?: Prisma.StringNullableFilter<"Track"> | string | null
+  albumCoverUrl?: Prisma.StringNullableFilter<"Track"> | string | null
   durationMs?: Prisma.IntFilter<"Track"> | number
   popularity?: Prisma.IntFilter<"Track"> | number
   createdAt?: Prisma.DateTimeFilter<"Track"> | Date | string
@@ -260,9 +252,8 @@ export type TrackOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artistName?: Prisma.SortOrder
-  albumName?: Prisma.SortOrder
-  albumCoverUrl?: Prisma.SortOrder
-  previewUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  albumName?: Prisma.SortOrderInput | Prisma.SortOrder
+  albumCoverUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   durationMs?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -277,9 +268,8 @@ export type TrackWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TrackWhereInput | Prisma.TrackWhereInput[]
   title?: Prisma.StringFilter<"Track"> | string
   artistName?: Prisma.StringFilter<"Track"> | string
-  albumName?: Prisma.StringFilter<"Track"> | string
-  albumCoverUrl?: Prisma.StringFilter<"Track"> | string
-  previewUrl?: Prisma.StringNullableFilter<"Track"> | string | null
+  albumName?: Prisma.StringNullableFilter<"Track"> | string | null
+  albumCoverUrl?: Prisma.StringNullableFilter<"Track"> | string | null
   durationMs?: Prisma.IntFilter<"Track"> | number
   popularity?: Prisma.IntFilter<"Track"> | number
   createdAt?: Prisma.DateTimeFilter<"Track"> | Date | string
@@ -291,9 +281,8 @@ export type TrackOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   artistName?: Prisma.SortOrder
-  albumName?: Prisma.SortOrder
-  albumCoverUrl?: Prisma.SortOrder
-  previewUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  albumName?: Prisma.SortOrderInput | Prisma.SortOrder
+  albumCoverUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   durationMs?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -311,9 +300,8 @@ export type TrackScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Track"> | string
   title?: Prisma.StringWithAggregatesFilter<"Track"> | string
   artistName?: Prisma.StringWithAggregatesFilter<"Track"> | string
-  albumName?: Prisma.StringWithAggregatesFilter<"Track"> | string
-  albumCoverUrl?: Prisma.StringWithAggregatesFilter<"Track"> | string
-  previewUrl?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null
+  albumName?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null
+  albumCoverUrl?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null
   durationMs?: Prisma.IntWithAggregatesFilter<"Track"> | number
   popularity?: Prisma.IntWithAggregatesFilter<"Track"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Track"> | Date | string
@@ -323,9 +311,8 @@ export type TrackCreateInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -337,9 +324,8 @@ export type TrackUncheckedCreateInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -351,9 +337,8 @@ export type TrackUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -365,9 +350,8 @@ export type TrackUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -379,9 +363,8 @@ export type TrackCreateManyInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -391,9 +374,8 @@ export type TrackUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -403,9 +385,8 @@ export type TrackUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -417,7 +398,6 @@ export type TrackCountOrderByAggregateInput = {
   artistName?: Prisma.SortOrder
   albumName?: Prisma.SortOrder
   albumCoverUrl?: Prisma.SortOrder
-  previewUrl?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -434,7 +414,6 @@ export type TrackMaxOrderByAggregateInput = {
   artistName?: Prisma.SortOrder
   albumName?: Prisma.SortOrder
   albumCoverUrl?: Prisma.SortOrder
-  previewUrl?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -446,7 +425,6 @@ export type TrackMinOrderByAggregateInput = {
   artistName?: Prisma.SortOrder
   albumName?: Prisma.SortOrder
   albumCoverUrl?: Prisma.SortOrder
-  previewUrl?: Prisma.SortOrder
   durationMs?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -502,9 +480,8 @@ export type TrackCreateWithoutAudioFeatureInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -515,9 +492,8 @@ export type TrackUncheckedCreateWithoutAudioFeatureInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -544,9 +520,8 @@ export type TrackUpdateWithoutAudioFeatureInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -557,9 +532,8 @@ export type TrackUncheckedUpdateWithoutAudioFeatureInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -570,9 +544,8 @@ export type TrackCreateWithoutPlaylistTracksInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -583,9 +556,8 @@ export type TrackUncheckedCreateWithoutPlaylistTracksInput = {
   id: string
   title: string
   artistName: string
-  albumName: string
-  albumCoverUrl: string
-  previewUrl?: string | null
+  albumName?: string | null
+  albumCoverUrl?: string | null
   durationMs: number
   popularity?: number
   createdAt?: Date | string
@@ -612,9 +584,8 @@ export type TrackUpdateWithoutPlaylistTracksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -625,9 +596,8 @@ export type TrackUncheckedUpdateWithoutPlaylistTracksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   artistName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumName?: Prisma.StringFieldUpdateOperationsInput | string
-  albumCoverUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  previewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  albumCoverUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   durationMs?: Prisma.IntFieldUpdateOperationsInput | number
   popularity?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -671,7 +641,6 @@ export type TrackSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   artistName?: boolean
   albumName?: boolean
   albumCoverUrl?: boolean
-  previewUrl?: boolean
   durationMs?: boolean
   popularity?: boolean
   createdAt?: boolean
@@ -686,7 +655,6 @@ export type TrackSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   artistName?: boolean
   albumName?: boolean
   albumCoverUrl?: boolean
-  previewUrl?: boolean
   durationMs?: boolean
   popularity?: boolean
   createdAt?: boolean
@@ -698,7 +666,6 @@ export type TrackSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   artistName?: boolean
   albumName?: boolean
   albumCoverUrl?: boolean
-  previewUrl?: boolean
   durationMs?: boolean
   popularity?: boolean
   createdAt?: boolean
@@ -710,13 +677,12 @@ export type TrackSelectScalar = {
   artistName?: boolean
   albumName?: boolean
   albumCoverUrl?: boolean
-  previewUrl?: boolean
   durationMs?: boolean
   popularity?: boolean
   createdAt?: boolean
 }
 
-export type TrackOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "artistName" | "albumName" | "albumCoverUrl" | "previewUrl" | "durationMs" | "popularity" | "createdAt", ExtArgs["result"]["track"]>
+export type TrackOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "artistName" | "albumName" | "albumCoverUrl" | "durationMs" | "popularity" | "createdAt", ExtArgs["result"]["track"]>
 export type TrackInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   audioFeature?: boolean | Prisma.Track$audioFeatureArgs<ExtArgs>
   playlistTracks?: boolean | Prisma.Track$playlistTracksArgs<ExtArgs>
@@ -735,9 +701,8 @@ export type $TrackPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     id: string
     title: string
     artistName: string
-    albumName: string
-    albumCoverUrl: string
-    previewUrl: string | null
+    albumName: string | null
+    albumCoverUrl: string | null
     durationMs: number
     popularity: number
     createdAt: Date
@@ -1171,7 +1136,6 @@ export interface TrackFieldRefs {
   readonly artistName: Prisma.FieldRef<"Track", 'String'>
   readonly albumName: Prisma.FieldRef<"Track", 'String'>
   readonly albumCoverUrl: Prisma.FieldRef<"Track", 'String'>
-  readonly previewUrl: Prisma.FieldRef<"Track", 'String'>
   readonly durationMs: Prisma.FieldRef<"Track", 'Int'>
   readonly popularity: Prisma.FieldRef<"Track", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Track", 'DateTime'>

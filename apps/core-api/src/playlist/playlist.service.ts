@@ -23,16 +23,16 @@ export class PlaylistService {
     private readonly trackService: TrackService,
   ) {}
 
-  async searchTracks(userId: string, query: string, limit: number) {
+  async searchTracks(userId: string, query: string, limit: number, offset = 0) {
     const normalizedQuery = query.trim();
-    const cacheInput = JSON.stringify({ version: 2, query: normalizedQuery, limit });
+    const cacheInput = JSON.stringify({ version: 3, query: normalizedQuery, limit, offset });
     const queryHash = createHash('sha256').update(cacheInput).digest('hex');
     const cacheKey = `search:${queryHash}`;
     const redis = this.redisService.getClient();
     const cached = await redis.get(cacheKey);
     if (cached !== null) return JSON.parse(cached) as TrackDTO[];
 
-    const tracks = await this.musicProviderAdapter.searchTracks(userId, normalizedQuery, limit);
+    const tracks = await this.musicProviderAdapter.searchTracks(userId, normalizedQuery, limit, offset);
     await redis.set(cacheKey, JSON.stringify(tracks), 'EX', SEARCH_CACHE_TTL_SECONDS);
     return tracks;
   }
@@ -90,6 +90,10 @@ export class PlaylistService {
         update: {},
       });
     }
+    await this.prisma.playlist.update({
+      where: { id: playlistId },
+      data: { displayMode: 'MANUAL_MANAGER' },
+    });
     return this.get(userId, playlistId);
   }
 
@@ -135,7 +139,19 @@ export class PlaylistService {
   private toPlaylistResponse(playlist: any) {
     const tracks = playlist.playlistTracks.map((item: any) => this.trackService.toDto(item.track));
     const featureKeys: Array<keyof AudioFeaturesDTO> = ['danceability', 'valence', 'energy', 'acousticness', 'instrumentalness', 'liveness', 'speechiness'];
-    const averageAudioFeatures = Object.fromEntries(featureKeys.map((key) => [key, tracks.length ? tracks.reduce((sum: number, track: TrackDTO) => sum + Number(track.audioFeatures?.[key] ?? 0), 0) / tracks.length : 0]));
-    return { playlistId: playlist.id, name: playlist.name, tracks, averageAudioFeatures, isPublic: playlist.isPublic, isExported: playlist.isExported };
+    const tracksWithFeatures = tracks.filter((track: TrackDTO) => track.audioFeatures !== null && track.audioFeatures !== undefined);
+    const averageAudioFeatures = tracksWithFeatures.length === 0
+      ? null
+      : Object.fromEntries(featureKeys.map((key) => [key, tracksWithFeatures.reduce((sum: number, track: TrackDTO) => sum + Number(track.audioFeatures?.[key] ?? 0), 0) / tracksWithFeatures.length]));
+    return {
+      playlistId: playlist.id,
+      name: playlist.name,
+      tracks,
+      averageAudioFeatures,
+      displayMode: playlist.displayMode as 'AI_ANALYTICS' | 'MANUAL_MANAGER',
+      isPublic: playlist.isPublic,
+      isExported: playlist.isExported,
+      spotifyPlaylistId: playlist.spotifyPlaylistId,
+    };
   }
 }

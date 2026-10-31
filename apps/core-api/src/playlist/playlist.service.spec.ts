@@ -17,7 +17,7 @@ describe('PlaylistService search cache', () => {
     const service = new PlaylistService({} as never, adapter as never, { getClient: () => redis } as never, {} as never);
 
     await expect(service.searchTracks('user-1', ' lofi ', 5)).resolves.toEqual(tracks);
-    expect(adapter.searchTracks).toHaveBeenCalledWith('user-1', 'lofi', 5);
+    expect(adapter.searchTracks).toHaveBeenCalledWith('user-1', 'lofi', 5, 0);
     expect(redis.set).toHaveBeenCalledWith(expect.stringMatching(/^search:/), JSON.stringify(tracks), 'EX', 86400);
   });
 });

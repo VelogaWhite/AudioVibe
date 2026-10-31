@@ -34,6 +34,10 @@ export class SpotifyTokenService {
     );
   }
 
+  async clearCachedAccessToken(userId: string) {
+    await this.redisService.getClient().del(`user:token:${userId}`);
+  }
+
   async refreshUserAccessToken(spotifyId: string) {
     const user = await this.usersService.findBySpotifyId(spotifyId);
 
@@ -93,7 +97,7 @@ export class SpotifyTokenService {
       }
     }
 
-    const refreshBufferMs = 60_000;
+    const refreshBufferMs = 5 * 60_000;
     if (user.tokenExpiresAt.getTime() > Date.now() + refreshBufferMs) {
       await this.redisService.getClient().set(
         `user:token:${user.id}`,

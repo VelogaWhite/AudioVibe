@@ -34,8 +34,6 @@ export type AudioFeatureAvgAggregateOutputType = {
   instrumentalness: number | null
   liveness: number | null
   speechiness: number | null
-  tempo: number | null
-  loudness: number | null
 }
 
 export type AudioFeatureSumAggregateOutputType = {
@@ -46,8 +44,6 @@ export type AudioFeatureSumAggregateOutputType = {
   instrumentalness: number | null
   liveness: number | null
   speechiness: number | null
-  tempo: number | null
-  loudness: number | null
 }
 
 export type AudioFeatureMinAggregateOutputType = {
@@ -59,8 +55,6 @@ export type AudioFeatureMinAggregateOutputType = {
   instrumentalness: number | null
   liveness: number | null
   speechiness: number | null
-  tempo: number | null
-  loudness: number | null
 }
 
 export type AudioFeatureMaxAggregateOutputType = {
@@ -72,8 +66,6 @@ export type AudioFeatureMaxAggregateOutputType = {
   instrumentalness: number | null
   liveness: number | null
   speechiness: number | null
-  tempo: number | null
-  loudness: number | null
 }
 
 export type AudioFeatureCountAggregateOutputType = {
@@ -85,8 +77,6 @@ export type AudioFeatureCountAggregateOutputType = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
   _all: number
 }
 
@@ -99,8 +89,6 @@ export type AudioFeatureAvgAggregateInputType = {
   instrumentalness?: true
   liveness?: true
   speechiness?: true
-  tempo?: true
-  loudness?: true
 }
 
 export type AudioFeatureSumAggregateInputType = {
@@ -111,8 +99,6 @@ export type AudioFeatureSumAggregateInputType = {
   instrumentalness?: true
   liveness?: true
   speechiness?: true
-  tempo?: true
-  loudness?: true
 }
 
 export type AudioFeatureMinAggregateInputType = {
@@ -124,8 +110,6 @@ export type AudioFeatureMinAggregateInputType = {
   instrumentalness?: true
   liveness?: true
   speechiness?: true
-  tempo?: true
-  loudness?: true
 }
 
 export type AudioFeatureMaxAggregateInputType = {
@@ -137,8 +121,6 @@ export type AudioFeatureMaxAggregateInputType = {
   instrumentalness?: true
   liveness?: true
   speechiness?: true
-  tempo?: true
-  loudness?: true
 }
 
 export type AudioFeatureCountAggregateInputType = {
@@ -150,8 +132,6 @@ export type AudioFeatureCountAggregateInputType = {
   instrumentalness?: true
   liveness?: true
   speechiness?: true
-  tempo?: true
-  loudness?: true
   _all?: true
 }
 
@@ -250,8 +230,6 @@ export type AudioFeatureGroupByOutputType = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
   _count: AudioFeatureCountAggregateOutputType | null
   _avg: AudioFeatureAvgAggregateOutputType | null
   _sum: AudioFeatureSumAggregateOutputType | null
@@ -286,8 +264,6 @@ export type AudioFeatureWhereInput = {
   instrumentalness?: Prisma.FloatFilter<"AudioFeature"> | number
   liveness?: Prisma.FloatFilter<"AudioFeature"> | number
   speechiness?: Prisma.FloatFilter<"AudioFeature"> | number
-  tempo?: Prisma.FloatFilter<"AudioFeature"> | number
-  loudness?: Prisma.FloatFilter<"AudioFeature"> | number
   track?: Prisma.XOR<Prisma.TrackScalarRelationFilter, Prisma.TrackWhereInput>
 }
 
@@ -300,8 +276,6 @@ export type AudioFeatureOrderByWithRelationInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
   track?: Prisma.TrackOrderByWithRelationInput
 }
 
@@ -317,8 +291,6 @@ export type AudioFeatureWhereUniqueInput = Prisma.AtLeast<{
   instrumentalness?: Prisma.FloatFilter<"AudioFeature"> | number
   liveness?: Prisma.FloatFilter<"AudioFeature"> | number
   speechiness?: Prisma.FloatFilter<"AudioFeature"> | number
-  tempo?: Prisma.FloatFilter<"AudioFeature"> | number
-  loudness?: Prisma.FloatFilter<"AudioFeature"> | number
   track?: Prisma.XOR<Prisma.TrackScalarRelationFilter, Prisma.TrackWhereInput>
 }, "trackId">
 
@@ -331,8 +303,6 @@ export type AudioFeatureOrderByWithAggregationInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
   _count?: Prisma.AudioFeatureCountOrderByAggregateInput
   _avg?: Prisma.AudioFeatureAvgOrderByAggregateInput
   _max?: Prisma.AudioFeatureMaxOrderByAggregateInput
@@ -352,8 +322,6 @@ export type AudioFeatureScalarWhereWithAggregatesInput = {
   instrumentalness?: Prisma.FloatWithAggregatesFilter<"AudioFeature"> | number
   liveness?: Prisma.FloatWithAggregatesFilter<"AudioFeature"> | number
   speechiness?: Prisma.FloatWithAggregatesFilter<"AudioFeature"> | number
-  tempo?: Prisma.FloatWithAggregatesFilter<"AudioFeature"> | number
-  loudness?: Prisma.FloatWithAggregatesFilter<"AudioFeature"> | number
 }
 
 export type AudioFeatureCreateInput = {
@@ -364,8 +332,6 @@ export type AudioFeatureCreateInput = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
   track: Prisma.TrackCreateNestedOneWithoutAudioFeatureInput
 }
 
@@ -378,8 +344,6 @@ export type AudioFeatureUncheckedCreateInput = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
 }
 
 export type AudioFeatureUpdateInput = {
@@ -390,8 +354,6 @@ export type AudioFeatureUpdateInput = {
   instrumentalness?: Prisma.FloatFieldUpdateOperationsInput | number
   liveness?: Prisma.FloatFieldUpdateOperationsInput | number
   speechiness?: Prisma.FloatFieldUpdateOperationsInput | number
-  tempo?: Prisma.FloatFieldUpdateOperationsInput | number
-  loudness?: Prisma.FloatFieldUpdateOperationsInput | number
   track?: Prisma.TrackUpdateOneRequiredWithoutAudioFeatureNestedInput
 }
 
@@ -404,8 +366,6 @@ export type AudioFeatureUncheckedUpdateInput = {
   instrumentalness?: Prisma.FloatFieldUpdateOperationsInput | number
   liveness?: Prisma.FloatFieldUpdateOperationsInput | number
   speechiness?: Prisma.FloatFieldUpdateOperationsInput | number
-  tempo?: Prisma.FloatFieldUpdateOperationsInput | number
-  loudness?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type AudioFeatureCreateManyInput = {
@@ -417,8 +377,6 @@ export type AudioFeatureCreateManyInput = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
 }
 
 export type AudioFeatureUpdateManyMutationInput = {
@@ -429,8 +387,6 @@ export type AudioFeatureUpdateManyMutationInput = {
   instrumentalness?: Prisma.FloatFieldUpdateOperationsInput | number
   liveness?: Prisma.FloatFieldUpdateOperationsInput | number
   speechiness?: Prisma.FloatFieldUpdateOperationsInput | number
-  tempo?: Prisma.FloatFieldUpdateOperationsInput | number
-  loudness?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type AudioFeatureUncheckedUpdateManyInput = {
@@ -442,8 +398,6 @@ export type AudioFeatureUncheckedUpdateManyInput = {
   instrumentalness?: Prisma.FloatFieldUpdateOperationsInput | number
   liveness?: Prisma.FloatFieldUpdateOperationsInput | number
   speechiness?: Prisma.FloatFieldUpdateOperationsInput | number
-  tempo?: Prisma.FloatFieldUpdateOperationsInput | number
-  loudness?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type AudioFeatureNullableScalarRelationFilter = {
@@ -460,8 +414,6 @@ export type AudioFeatureCountOrderByAggregateInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
 }
 
 export type AudioFeatureAvgOrderByAggregateInput = {
@@ -472,8 +424,6 @@ export type AudioFeatureAvgOrderByAggregateInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
 }
 
 export type AudioFeatureMaxOrderByAggregateInput = {
@@ -485,8 +435,6 @@ export type AudioFeatureMaxOrderByAggregateInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
 }
 
 export type AudioFeatureMinOrderByAggregateInput = {
@@ -498,8 +446,6 @@ export type AudioFeatureMinOrderByAggregateInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
 }
 
 export type AudioFeatureSumOrderByAggregateInput = {
@@ -510,8 +456,6 @@ export type AudioFeatureSumOrderByAggregateInput = {
   instrumentalness?: Prisma.SortOrder
   liveness?: Prisma.SortOrder
   speechiness?: Prisma.SortOrder
-  tempo?: Prisma.SortOrder
-  loudness?: Prisma.SortOrder
 }
 
 export type AudioFeatureCreateNestedOneWithoutTrackInput = {
@@ -554,8 +498,6 @@ export type AudioFeatureCreateWithoutTrackInput = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
 }
 
 export type AudioFeatureUncheckedCreateWithoutTrackInput = {
@@ -566,8 +508,6 @@ export type AudioFeatureUncheckedCreateWithoutTrackInput = {
   instrumentalness: number
   liveness: number
   speechiness: number
-  tempo: number
-  loudness: number
 }
 
 export type AudioFeatureCreateOrConnectWithoutTrackInput = {
@@ -594,8 +534,6 @@ export type AudioFeatureUpdateWithoutTrackInput = {
   instrumentalness?: Prisma.FloatFieldUpdateOperationsInput | number
   liveness?: Prisma.FloatFieldUpdateOperationsInput | number
   speechiness?: Prisma.FloatFieldUpdateOperationsInput | number
-  tempo?: Prisma.FloatFieldUpdateOperationsInput | number
-  loudness?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 export type AudioFeatureUncheckedUpdateWithoutTrackInput = {
@@ -606,8 +544,6 @@ export type AudioFeatureUncheckedUpdateWithoutTrackInput = {
   instrumentalness?: Prisma.FloatFieldUpdateOperationsInput | number
   liveness?: Prisma.FloatFieldUpdateOperationsInput | number
   speechiness?: Prisma.FloatFieldUpdateOperationsInput | number
-  tempo?: Prisma.FloatFieldUpdateOperationsInput | number
-  loudness?: Prisma.FloatFieldUpdateOperationsInput | number
 }
 
 
@@ -621,8 +557,6 @@ export type AudioFeatureSelect<ExtArgs extends runtime.Types.Extensions.Internal
   instrumentalness?: boolean
   liveness?: boolean
   speechiness?: boolean
-  tempo?: boolean
-  loudness?: boolean
   track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["audioFeature"]>
 
@@ -635,8 +569,6 @@ export type AudioFeatureSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   instrumentalness?: boolean
   liveness?: boolean
   speechiness?: boolean
-  tempo?: boolean
-  loudness?: boolean
   track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["audioFeature"]>
 
@@ -649,8 +581,6 @@ export type AudioFeatureSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   instrumentalness?: boolean
   liveness?: boolean
   speechiness?: boolean
-  tempo?: boolean
-  loudness?: boolean
   track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["audioFeature"]>
 
@@ -663,11 +593,9 @@ export type AudioFeatureSelectScalar = {
   instrumentalness?: boolean
   liveness?: boolean
   speechiness?: boolean
-  tempo?: boolean
-  loudness?: boolean
 }
 
-export type AudioFeatureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"trackId" | "danceability" | "valence" | "energy" | "acousticness" | "instrumentalness" | "liveness" | "speechiness" | "tempo" | "loudness", ExtArgs["result"]["audioFeature"]>
+export type AudioFeatureOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"trackId" | "danceability" | "valence" | "energy" | "acousticness" | "instrumentalness" | "liveness" | "speechiness", ExtArgs["result"]["audioFeature"]>
 export type AudioFeatureInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>
 }
@@ -692,8 +620,6 @@ export type $AudioFeaturePayload<ExtArgs extends runtime.Types.Extensions.Intern
     instrumentalness: number
     liveness: number
     speechiness: number
-    tempo: number
-    loudness: number
   }, ExtArgs["result"]["audioFeature"]>
   composites: {}
 }
@@ -1126,8 +1052,6 @@ export interface AudioFeatureFieldRefs {
   readonly instrumentalness: Prisma.FieldRef<"AudioFeature", 'Float'>
   readonly liveness: Prisma.FieldRef<"AudioFeature", 'Float'>
   readonly speechiness: Prisma.FieldRef<"AudioFeature", 'Float'>
-  readonly tempo: Prisma.FieldRef<"AudioFeature", 'Float'>
-  readonly loudness: Prisma.FieldRef<"AudioFeature", 'Float'>
 }
     
 
