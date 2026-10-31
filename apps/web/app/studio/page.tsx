@@ -14,6 +14,7 @@ import {
   usePlaylistStore,
   AudioFeatures,
   Track,
+  ThemeVibe,
 } from '../../store/usePlaylistStore';
 import { Sidebar } from '../../components/Sidebar';
 import { AIPromptBox } from '../../components/AIPromptBox';
@@ -205,31 +206,38 @@ export default function UnifiedPlaylistStudioPage() {
     setStatusMessage('กำลังวิเคราะห์อารมณ์และสกัด 7 มิติเสียงด้วย AI...');
 
     // Dynamic Theme Switching (Gimmick):
-    // 1. Love mood -> LOVE (Dark Pink, Hearts)
-    // 2. Sad / Rainy mood -> RAINY (Moody Blue, Rain Clouds & Falling Rain)
-    // 3. High Energy mood -> FIRE (Dark Red-Orange, Flames & Ember Sparks)
-    // 4. Default / Chill -> NATURE (Dark Green, Vines, Leaves & Flowers)
-    const isLoveMood =
-      presetLabel?.includes('รัก') ||
-      /รัก|คลั่งรัก|แฟน|love|romantic|หัวใจ|หวาน|วาเลนไทน์|in love/i.test(promptText);
+    // 1. Preset label has highest priority
+    let themeToSet: ThemeVibe = 'NATURE';
 
-    const isRainyMood =
-      presetLabel?.includes('เหงา') ||
-      /เหงา|เศร้า|ร้องไห้|sad|alone|อกหัก|ฝน|rain|คิดถึง|depress/i.test(promptText);
-
-    const isFireMood =
-      presetLabel?.includes('มัน') ||
-      /มัน|ตื๊ด|เต้น|เร็ว|rock|dance|club|party|ไฟ|fire|เบสหนัก|สุดเหวี่ยง|สนุก/i.test(promptText);
-
-    if (isLoveMood) {
-      setThemeVibe('LOVE');
-    } else if (isRainyMood) {
-      setThemeVibe('RAINY');
-    } else if (isFireMood) {
-      setThemeVibe('FIRE');
+    if (presetLabel) {
+      if (presetLabel.includes('รัก')) {
+        themeToSet = 'LOVE';
+      } else if (presetLabel.includes('เหงา')) {
+        themeToSet = 'RAINY';
+      } else if (presetLabel.includes('มัน')) {
+        themeToSet = 'FIRE';
+      } else {
+        // '🏡 อยากกลับบ้าน', '🍃 ผ่อนคลาย', '🎯 สมาธิขั้นสุด' -> ธีมสีเขียวธรรมชาติเสมอ
+        themeToSet = 'NATURE';
+      }
     } else {
-      setThemeVibe('NATURE');
+      // 2. If user types custom natural language prompt
+      const isHomeOrChill = /บ้าน|กลับบ้าน|ผ่อนคลาย|สมาธิ|ชิล|โฟกัส|study|focus|chill|relax|nostalgia/i.test(promptText);
+
+      if (isHomeOrChill) {
+        themeToSet = 'NATURE';
+      } else if (/คลั่งรัก|เพลงรัก|อินเลิฟ|romantic|วาเลนไทน์|\blove\b|หวาน/i.test(promptText) || (/รัก/i.test(promptText) && !/น่ารัก|อนุรักษ์/i.test(promptText))) {
+        themeToSet = 'LOVE';
+      } else if (/เหงา|เศร้า|ร้องไห้|อกหัก|ฝน|rain|sad|alone|depress/i.test(promptText)) {
+        themeToSet = 'RAINY';
+      } else if (/มัน|ตื๊ด|เต้น|rock|dance|club|party|ไฟ|fire|เบสหนัก|สุดเหวี่ยง/i.test(promptText)) {
+        themeToSet = 'FIRE';
+      } else {
+        themeToSet = 'NATURE';
+      }
     }
+
+    setThemeVibe(themeToSet);
 
     try {
       const result = await generateAIRecommendations(user.id, promptText, presetLabel);
