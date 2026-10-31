@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
 import { SpotifyAuthService } from './spotify-auth.service.js';
 import { UsersService } from '../users/users.service.js';
@@ -13,15 +13,24 @@ export class SpotifyAuthController {
   ) {}
 
   @Get('login')
-  login(@Res() response: Response) {
+  async login(@Res() response: Response) {
     const authorizationUrl =
-      this.spotifyAuthService.getAuthorizationUrl();
+      await this.spotifyAuthService.getAuthorizationUrl();
 
     return response.redirect(authorizationUrl);
   }
 
   @Get('callback')
-  async callback(@Query('code') code: string) {
+  async callback(@Query('code') code: string, @Query('state') state: string) {
+    const validState = await this.spotifyAuthService.consumeAuthorizationState(state);
+    if (!validState) {
+      throw new BadRequestException('Invalid or expired Spotify OAuth state');
+    }
+
+    if (!code) {
+      throw new BadRequestException('Spotify authorization code is required');
+    }
+
     const tokenData =
       await this.spotifyAuthService.exchangeCodeForToken(code);
 
@@ -56,5 +65,15 @@ export class SpotifyAuthController {
       displayName: user.displayName,
       email: user.email,
     };
+  }
+
+  @Post('logout')
+  async logout(@Query('userId') userId: string) {
+    if (!userId) {
+      throw new BadRequestException('userId is required');
+    }
+
+    await this.spotifyTokenService.clearCachedAccessToken(userId);
+    return { loggedOut: true, userId };
   }
 }

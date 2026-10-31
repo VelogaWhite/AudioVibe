@@ -13,10 +13,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = exception instanceof HttpException
+      ? exception.getStatus()
+      : this.getErrorStatus(exception);
 
     const exceptionResponse =
       exception instanceof HttpException ? exception.getResponse() : null;
@@ -36,5 +35,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path: request.url,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  private getErrorStatus(exception: unknown): number {
+    const message = exception instanceof Error ? exception.message : '';
+    const match = message.match(/Spotify (?:API request|profile request|token exchange|token refresh) failed: (401|403|429)/);
+    if (match) return Number(match[1]);
+    return HttpStatus.INTERNAL_SERVER_ERROR;
   }
 }

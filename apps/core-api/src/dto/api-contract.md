@@ -2,7 +2,7 @@
 
 ## Generate Playlist
 
-### Endpoint
+### Endpoint (reserved until ML service is available)
 
 POST /playlists/generate
 
@@ -21,7 +21,7 @@ POST /playlists/generate
 
 ## Refine Playlist
 
-### Endpoint
+### Endpoint (reserved until ML service is available)
 
 POST /playlists/refine
 
@@ -58,7 +58,10 @@ POST /playlists/export
 
 ### Endpoint
 
-GET `/playlists/search?userId={internalUserId}&query={query}&limit={1-50}`
+GET `/playlists/search?userId={internalUserId}&query={query}&limit={1-50}&offset={0+}`
+
+The current route is retained for backward compatibility. The V2 public route
+will be `/tracks/search` when the API version prefix and frontend are introduced.
 
 ### Response Body
 
@@ -75,8 +78,9 @@ GET `/playlists/search?userId={internalUserId}&query={query}&limit={1-50}`
 - DELETE `/playlists/{playlistId}/tracks/{trackId}?userId={internalUserId}`
 - PATCH `/playlists/{playlistId}/tracks/order`
 
-## Audio Features
+## Audio Features (internal dataset/cache only)
 
 GET `/tracks/audio-features?userId={internalUserId}&trackIds={id1,id2}`
 
-The result is cached with `track:features:{trackId}` for 7 days.
+The result is read from PostgreSQL and cached with `track:features:{trackId}` for
+7 days. This endpoint must never call Spotify's Audio Features API.

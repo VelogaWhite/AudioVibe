@@ -24,5 +24,12 @@ export class PlaylistResponseDTO {
 
   @ValidateNested()
   @Type(() => AudioFeaturesDTO)
-  averageAudioFeatures: AudioFeaturesDTO;
+  averageAudioFeatures: AudioFeaturesDTO | null;
+
+  @IsString()
+  displayMode: 'AI_ANALYTICS' | 'MANUAL_MANAGER';
+
+  isExported: boolean;
+
+  spotifyPlaylistId?: string | null;
 }

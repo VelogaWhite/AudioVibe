@@ -23,17 +23,13 @@ export class TrackDTO {
   @IsNotEmpty()
   artistName: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  albumName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  albumCoverUrl: string;
+  albumName: string | null;
 
   @IsOptional()
   @IsString()
-  previewUrl: string | null;
+  albumCoverUrl: string | null;
 
   @IsInt()
   @Min(0)

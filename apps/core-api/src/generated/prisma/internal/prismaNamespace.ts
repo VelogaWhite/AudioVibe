@@ -948,6 +948,7 @@ export const PlaylistScalarFieldEnum = {
   description: 'description',
   isPublic: 'isPublic',
   isExported: 'isExported',
+  displayMode: 'displayMode',
   exportedAt: 'exportedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -962,7 +963,6 @@ export const TrackScalarFieldEnum = {
   artistName: 'artistName',
   albumName: 'albumName',
   albumCoverUrl: 'albumCoverUrl',
-  previewUrl: 'previewUrl',
   durationMs: 'durationMs',
   popularity: 'popularity',
   createdAt: 'createdAt'
@@ -979,9 +979,7 @@ export const AudioFeatureScalarFieldEnum = {
   acousticness: 'acousticness',
   instrumentalness: 'instrumentalness',
   liveness: 'liveness',
-  speechiness: 'speechiness',
-  tempo: 'tempo',
-  loudness: 'loudness'
+  speechiness: 'speechiness'
 } as const
 
 export type AudioFeatureScalarFieldEnum = (typeof AudioFeatureScalarFieldEnum)[keyof typeof AudioFeatureScalarFieldEnum]
