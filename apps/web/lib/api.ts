@@ -17,14 +17,7 @@ export async function fetchUserProfile(userId?: string) {
     if (!res.ok) throw new Error('User not found');
     return await res.json();
   } catch {
-    // Fallback Mock Profile for offline / dev
-    return {
-      id: userId || '58c016ef-d257-4110-9ec5-018707204218',
-      displayName: 'Yotsudoi',
-      spotifyId: '314h43huivz7rwk72p4emdkg7tmy',
-      profileImageUrl:
-        'https://i.scdn.co/image/ab6775700000ee85480511a23ccdfc3adcb1cf3b',
-    };
+    return null;
   }
 }
 

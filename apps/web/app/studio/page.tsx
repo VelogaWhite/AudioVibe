@@ -70,11 +70,10 @@ export default function UnifiedPlaylistStudioPage() {
     spotifyId: string;
     profileImageUrl?: string;
   }>({
-    id: '58c016ef-d257-4110-9ec5-018707204218',
-    displayName: 'Yotsudoi',
-    spotifyId: '314h43huivz7rwk72p4emdkg7tmy',
-    profileImageUrl:
-      'https://i.scdn.co/image/ab6775700000ee85480511a23ccdfc3adcb1cf3b',
+    id: '',
+    displayName: 'กำลังโหลด...',
+    spotifyId: '',
+    profileImageUrl: undefined,
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
