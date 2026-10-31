@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Trash2, GripVertical, ArrowUp, ArrowDown, Music2 } from 'lucide-react';
+import { Trash2, GripVertical, ArrowUp, ArrowDown, Music2, Sparkles } from 'lucide-react';
 import { Track } from '../store/usePlaylistStore';
 
 interface TrackItemProps {
@@ -19,64 +19,94 @@ export function TrackItem({
   onRemove,
   onMove,
 }: TrackItemProps) {
+  const f = track.audioFeatures;
+
   return (
-    <article className="group flex items-center gap-3 p-3 rounded-xl bg-[#0e1913]/90 hover:bg-[#15251c] border border-[#1e3829] hover:border-[#2d573f] transition-all">
-      {/* Drag handle / Reorder buttons */}
-      <div className="flex items-center text-[#557863] group-hover:text-[#90b89f]">
-        <GripVertical className="w-4 h-4 cursor-grab" />
-        <div className="flex flex-col ml-1">
-          <button
-            onClick={() => onMove(index, index - 1)}
-            disabled={index === 0}
-            title="เลื่อนขึ้น"
-            className="p-0.5 hover:text-[#1ed760] disabled:opacity-20 disabled:hover:text-inherit"
-          >
-            <ArrowUp className="w-3 h-3" />
-          </button>
-          <button
-            onClick={() => onMove(index, index + 1)}
-            disabled={index === totalTracks - 1}
-            title="เลื่อนลง"
-            className="p-0.5 hover:text-[#1ed760] disabled:opacity-20 disabled:hover:text-inherit"
-          >
-            <ArrowDown className="w-3 h-3" />
-          </button>
+    <article className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-[#0e1913]/90 hover:bg-[#15251c] border border-[#1e3829] hover:border-[#2d573f] transition-all">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        {/* Drag handle / Reorder buttons */}
+        <div className="flex items-center text-[#557863] group-hover:text-[#90b89f]">
+          <GripVertical className="w-4 h-4 cursor-grab" />
+          <div className="flex flex-col ml-1">
+            <button
+              onClick={() => onMove(index, index - 1)}
+              disabled={index === 0}
+              title="เลื่อนขึ้น"
+              className="p-0.5 hover:text-[#1ed760] disabled:opacity-20 disabled:hover:text-inherit"
+            >
+              <ArrowUp className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => onMove(index, index + 1)}
+              disabled={index === totalTracks - 1}
+              title="เลื่อนลง"
+              className="p-0.5 hover:text-[#1ed760] disabled:opacity-20 disabled:hover:text-inherit"
+            >
+              <ArrowDown className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* Index number */}
+        <span className="text-xs font-mono text-[#587a66] w-5 text-right">
+          {index + 1}
+        </span>
+
+        {/* Album Cover */}
+        <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#1a2f24] shrink-0 border border-[#234231]">
+          {track.albumCoverUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={track.albumCoverUrl}
+              alt={track.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[#416850]">
+              <Music2 className="w-5 h-5" />
+            </div>
+          )}
+        </div>
+
+        {/* Track Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-white truncate group-hover:text-[#1ed760] transition-colors">
+              {track.title}
+            </h4>
+            {track.matchScore && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#143d26] text-[#1ed760] border border-[#1ed760]/30 shrink-0">
+                <Sparkles className="w-2.5 h-2.5" />
+                {track.matchScore}% Match
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-[#89ab97] truncate mt-0.5">
+            {track.artistName} {track.albumName ? `• ${track.albumName}` : ''}
+          </p>
+
+          {/* Audio Feature Stats (When Available) */}
+          {f && (
+            <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#162a1f] text-[#8ce4aa] border border-[#234230]">
+                ⚡ Energy: {(f.energy * 100).toFixed(0)}%
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#162a1f] text-[#8ce4aa] border border-[#234230]">
+                💃 Dance: {(f.danceability * 100).toFixed(0)}%
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#162a1f] text-[#8ce4aa] border border-[#234230]">
+                🎭 Valence: {(f.valence * 100).toFixed(0)}%
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#162a1f] text-[#8ce4aa] border border-[#234230]">
+                🎸 Acoustic: {(f.acousticness * 100).toFixed(0)}%
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Index number */}
-      <span className="text-xs font-mono text-[#587a66] w-5 text-right">
-        {index + 1}
-      </span>
-
-      {/* Album Cover */}
-      <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#1a2f24] shrink-0 border border-[#234231]">
-        {track.albumCoverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={track.albumCoverUrl}
-            alt={track.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#416850]">
-            <Music2 className="w-5 h-5" />
-          </div>
-        )}
-      </div>
-
-      {/* Track Info */}
-      <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-semibold text-white truncate group-hover:text-[#1ed760] transition-colors">
-          {track.title}
-        </h4>
-        <p className="text-xs text-[#89ab97] truncate mt-0.5">
-          {track.artistName} {track.albumName ? `• ${track.albumName}` : ''}
-        </p>
-      </div>
-
       {/* Actions: Trash Icon (No HTML5 <audio> tag allowed!) */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2 shrink-0">
         <button
           onClick={() => onRemove(track.id)}
           title="ลบเพลงออกจากเพลย์ลิสต์"
