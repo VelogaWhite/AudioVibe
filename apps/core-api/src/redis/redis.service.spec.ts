@@ -2,6 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { RedisService } from './redis.service';
 
+// Mock ioredis ด้วย Class เพื่อให้รองรับคำสั่ง new Redis(...) ได้ 100%
+vi.mock('ioredis', () => {
+    class RedisMock {
+        get = vi.fn();
+        set = vi.fn();
+        del = vi.fn();
+        quit = vi.fn().mockResolvedValue('OK');
+        on = vi.fn();
+    }
+
+    return {
+        default: RedisMock,
+        Redis: RedisMock,
+    };
+});
+
 describe('RedisService (TC-EDGE-02)', () => {
     let service: RedisService;
 
@@ -18,7 +34,6 @@ describe('RedisService (TC-EDGE-02)', () => {
     });
 
     it('ควรจัดการวงจร Lifecycle ได้โดยไม่ Crash', () => {
-        // ทดสอบฟังก์ชัน Lifecycle พื้นฐานของ Redis Module
         if (typeof (service as any).onModuleInit === 'function') {
             expect(() => (service as any).onModuleInit()).not.toThrow();
         }
