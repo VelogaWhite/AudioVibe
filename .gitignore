@@ -24,3 +24,7 @@ playwright-report/
 .DS_Store
 .vscode/
 .idea/
+.coverage
+.pytest_cache/
+**/__pycache__/
+apps/ml-service/venv/
