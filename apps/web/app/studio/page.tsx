@@ -399,7 +399,6 @@ export default function UnifiedPlaylistStudioPage() {
               <h1 className="text-xl font-extrabold text-white tracking-tight">
                 Audio<span className="text-[#1ed760]">Vibe</span> Studio
               </h1>
-              <p className="text-[11px] text-[#86a894]">Unified Playlist Workspace V2</p>
             </div>
           </div>
         </div>
