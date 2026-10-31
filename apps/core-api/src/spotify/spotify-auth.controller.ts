@@ -21,7 +21,11 @@ export class SpotifyAuthController {
   }
 
   @Get('callback')
-  async callback(@Query('code') code: string, @Query('state') state: string) {
+  async callback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() response: Response,
+  ) {
     const validState = await this.spotifyAuthService.consumeAuthorizationState(state);
     if (!validState) {
       throw new BadRequestException('Invalid or expired Spotify OAuth state');
@@ -58,13 +62,8 @@ export class SpotifyAuthController {
       tokenData.expires_in,
     );
 
-    return {
-      message: 'Spotify authentication successful',
-      userId: user.id,
-      spotifyId: user.spotifyId,
-      displayName: user.displayName,
-      email: user.email,
-    };
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+    return response.redirect(`${frontendUrl}/studio?userId=${user.id}`);
   }
 
   @Post('logout')

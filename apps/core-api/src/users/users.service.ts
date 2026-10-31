@@ -66,6 +66,14 @@ export class UsersService {
     });
   }
 
+  async findLatestUser() {
+    return this.prisma.user.findFirst({
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    });
+  }
+
   async updateAccessToken(
     spotifyId: string,
     accessToken: string,

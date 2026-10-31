@@ -5,6 +5,18 @@ import { UsersService } from './users.service.js';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('latest/me')
+  async getLatestUser() {
+    const user = await this.usersService.findLatestUser();
+    if (!user) throw new NotFoundException('No user found in database');
+    return {
+      id: user.id,
+      spotifyId: user.spotifyId,
+      displayName: user.displayName,
+      profileImageUrl: user.profileImageUrl,
+    };
+  }
+
   @Get(':id')
   async getPublicProfile(@Param('id') id: string) {
     const user = await this.usersService.findById(id);
