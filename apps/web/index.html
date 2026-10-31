@@ -32,6 +32,10 @@
     <aside>
       <section class="card">
         <div class="profile"><img id="profileImage" alt="Spotify profile" /><div><strong id="profileName">Loading...</strong><small id="profileId"></small></div></div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;">
+          <button class="secondary small" onclick="window.location.href='/auth/spotify/login'">Connect Spotify</button>
+          <button class="secondary small" onclick="switchUser()">Switch User</button>
+        </div>
         <label for="playlistSelect">Active playlist</label><select id="playlistSelect" onchange="selectPlaylist()"><option value="">No playlist selected</option></select>
         <button onclick="createPlaylist()">＋ New playlist</button>
         <button class="secondary" onclick="loadPlaylists()">Refresh playlists</button>
@@ -46,7 +50,22 @@
   </div>
 </main>
 <script>
-  const USER_ID = 'a5d8adf6-3914-47ed-9969-30fad7e10e37';
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramUserId = urlParams.get('userId');
+  if (paramUserId) {
+    localStorage.setItem('audiovibe_user_id', paramUserId);
+  }
+  const USER_ID = paramUserId || localStorage.getItem('audiovibe_user_id') || '43f295f3-da71-4854-815c-9f881e42a0ad';
+
+  function switchUser() {
+    const entered = prompt('ระบุ User ID ที่ต้องการใช้งาน:', USER_ID);
+    if (entered && entered.trim()) {
+      localStorage.setItem('audiovibe_user_id', entered.trim());
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.set('userId', entered.trim());
+      window.location.href = nextUrl.toString();
+    }
+  }
   const state = { tracks: [], playlists: [], selected: null };
   const $ = (id) => document.getElementById(id);
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
