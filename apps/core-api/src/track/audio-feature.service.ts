@@ -16,7 +16,7 @@ export class AudioFeatureService {
     const result = new Map<string, any>();
     const missing: string[] = [];
 
-    for (const trackId of [...new Set(trackIds)]) {
+    for (const trackId of new Set(trackIds)) {
       const cached = await redis.get(`track:features:${trackId}`);
       if (cached) {
         result.set(trackId, JSON.parse(cached));

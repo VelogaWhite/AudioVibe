@@ -8,8 +8,8 @@ interface TrackItemProps {
   track: Track;
   index: number;
   totalTracks: number;
-  onRemove: (trackId: string) => void;
-  onMove: (fromIndex: number, toIndex: number) => void;
+  onRemove: (trackId: string) => void | Promise<void>;
+  onMove: (fromIndex: number, toIndex: number) => void | Promise<void>;
 }
 
 function formatDuration(ms: number): string {
@@ -34,15 +34,34 @@ export function TrackItem({
   onMove,
 }: TrackItemProps) {
   const f = track.audioFeatures;
+  const handleDragStart = (event: React.DragEvent<HTMLElement>) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(index));
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    const sourceIndex = Number(event.dataTransfer.getData('text/plain'));
+    if (Number.isInteger(sourceIndex) && sourceIndex !== index) {
+      void onMove(sourceIndex, index);
+    }
+  };
 
   return (
-    <article className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-[#0e1913]/90 hover:bg-[#15251c] border border-[#1e3829] hover:border-[#2d573f] transition-all duration-200">
+    <article
+      draggable
+      onDragStart={handleDragStart}
+      onDragOver={(event) => event.preventDefault()}
+      onDrop={handleDrop}
+      className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-[#0e1913]/90 hover:bg-[#15251c] border border-[#1e3829] hover:border-[#2d573f] transition-all duration-200 cursor-grab active:cursor-grabbing"
+    >
       <div className="flex items-center gap-3 min-w-0 flex-1">
         {/* Drag handle / Reorder buttons */}
         <div className="flex items-center text-[#557863] group-hover:text-[#90b89f] transition-colors">
           <GripVertical className="w-4 h-4 cursor-grab active:cursor-grabbing" />
           <div className="flex flex-col ml-0.5">
             <button
+              type="button"
               onClick={() => onMove(index, index - 1)}
               disabled={index === 0}
               title="เลื่อนขึ้น"
@@ -51,6 +70,7 @@ export function TrackItem({
               <ArrowUp className="w-3 h-3" />
             </button>
             <button
+              type="button"
               onClick={() => onMove(index, index + 1)}
               disabled={index === totalTracks - 1}
               title="เลื่อนลง"
@@ -149,6 +169,7 @@ export function TrackItem({
         )}
         {/* Remove button */}
         <button
+          type="button"
           onClick={() => onRemove(track.id)}
           title="ลบเพลงออกจากเพลย์ลิสต์"
           className="p-2 rounded-lg text-[#7c9d89] hover:text-[#ff6b6b] hover:bg-[#341818] transition-colors"
