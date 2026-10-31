@@ -16,7 +16,10 @@ export interface Track {
   artistName: string;
   albumName?: string;
   albumCoverUrl?: string;
+  durationMs?: number;
+  spotifyUrl?: string;
   audioFeatures?: AudioFeatures;
+  matchScore?: number;
 }
 
 export interface Playlist {

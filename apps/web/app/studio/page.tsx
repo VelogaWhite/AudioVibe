@@ -7,8 +7,6 @@ import {
   Music,
   BarChart3,
   ListMusic,
-  Eye,
-  EyeOff,
   Sparkles,
   ArrowLeft,
 } from 'lucide-react';
@@ -321,29 +319,10 @@ export default function UnifiedPlaylistStudioPage() {
         {/* Status Indicator */}
         <div className="flex items-center gap-3">
           {statusMessage && (
-            <span className="text-xs text-[#a3d8b5] bg-[#12271c] border border-[#204732] px-3 py-1 rounded-full hidden sm:inline-block animate-fade-in">
+            <span className="text-xs text-[#a3d8b5] bg-[#12271c] border border-[#204732] px-3 py-1 rounded-full animate-fade-in">
               {statusMessage}
             </span>
           )}
-          <span
-            className={`text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1.5 ${
-              displayMode === 'AI_ANALYTICS'
-                ? 'bg-[#1b432c] text-[#1ed760] border border-[#1ed760]/30'
-                : 'bg-[#222f28] text-[#93b39f]'
-            }`}
-          >
-            {displayMode === 'AI_ANALYTICS' ? (
-              <>
-                <Eye className="w-3.5 h-3.5" />
-                <span>AI Analytics View</span>
-              </>
-            ) : (
-              <>
-                <EyeOff className="w-3.5 h-3.5" />
-                <span>Manual Manager View</span>
-              </>
-            )}
-          </span>
         </div>
       </header>
 

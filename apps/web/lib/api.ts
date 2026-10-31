@@ -212,6 +212,8 @@ export async function generateAIRecommendations(
     artist: string;
     album: string;
     cover: string;
+    durationMs: number;
+    spotifyUrl: string;
     features: AudioFeatures;
   };
 
@@ -233,6 +235,8 @@ export async function generateAIRecommendations(
         artist: 'Joji',
         album: 'SMITHEREENS',
         cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+        durationMs: 233000,
+        spotifyUrl: 'https://open.spotify.com/track/2pNHFCEbpbLhJCmPkbqCHc',
         features: { danceability: 0.34, valence: 0.20, energy: 0.28, acousticness: 0.85, instrumentalness: 0.22, liveness: 0.25, speechiness: 0.05 },
       },
       {
@@ -240,6 +244,8 @@ export async function generateAIRecommendations(
         artist: 'Conan Gray',
         album: 'Kid Krow',
         cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120',
+        durationMs: 198000,
+        spotifyUrl: 'https://open.spotify.com/track/4xqrdfXkTW4T0RauPLv3WA',
         features: { danceability: 0.36, valence: 0.24, energy: 0.32, acousticness: 0.80, instrumentalness: 0.20, liveness: 0.26, speechiness: 0.06 },
       },
       {
@@ -247,6 +253,8 @@ export async function generateAIRecommendations(
         artist: 'Lewis Capaldi',
         album: 'Divinely Uninspired',
         cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120',
+        durationMs: 221000,
+        spotifyUrl: 'https://open.spotify.com/track/7qEHsqek33rTcFNT9PFqLf',
         features: { danceability: 0.38, valence: 0.26, energy: 0.38, acousticness: 0.75, instrumentalness: 0.15, liveness: 0.28, speechiness: 0.07 },
       },
       {
@@ -254,6 +262,8 @@ export async function generateAIRecommendations(
         artist: 'Olivia Rodrigo',
         album: 'SOUR',
         cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120',
+        durationMs: 242000,
+        spotifyUrl: 'https://open.spotify.com/track/5wANPM4fQCJwkGd4rN57mH',
         features: { danceability: 0.35, valence: 0.21, energy: 0.40, acousticness: 0.72, instrumentalness: 0.18, liveness: 0.30, speechiness: 0.06 },
       },
       {
@@ -261,6 +271,8 @@ export async function generateAIRecommendations(
         artist: 'Three Man Down',
         album: 'This City Won\'t Be Lonely',
         cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120',
+        durationMs: 256000,
+        spotifyUrl: 'https://open.spotify.com/track/5kDMXHPY1ZnKMBzFAr4RiK',
         features: { danceability: 0.37, valence: 0.25, energy: 0.36, acousticness: 0.78, instrumentalness: 0.20, liveness: 0.25, speechiness: 0.05 },
       },
       {
@@ -268,6 +280,8 @@ export async function generateAIRecommendations(
         artist: 'Coldplay',
         album: 'X&Y',
         cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=120',
+        durationMs: 295000,
+        spotifyUrl: 'https://open.spotify.com/track/7LVHVU3tWfcxj5aiPFEW4Q',
         features: { danceability: 0.30, valence: 0.19, energy: 0.35, acousticness: 0.84, instrumentalness: 0.30, liveness: 0.22, speechiness: 0.05 },
       },
       {
@@ -275,6 +289,8 @@ export async function generateAIRecommendations(
         artist: 'NONT TANONT',
         album: 'Cigarette Candy & Vanilla Sky',
         cover: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=120',
+        durationMs: 218000,
+        spotifyUrl: 'https://open.spotify.com/track/3fcte2GVCzvFMsB17AKMSN',
         features: { danceability: 0.40, valence: 0.27, energy: 0.34, acousticness: 0.74, instrumentalness: 0.16, liveness: 0.27, speechiness: 0.06 },
       },
     ];
@@ -294,6 +310,8 @@ export async function generateAIRecommendations(
         artist: 'The Weeknd',
         album: 'After Hours',
         cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120',
+        durationMs: 200000,
+        spotifyUrl: 'https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b',
         features: { danceability: 0.86, valence: 0.84, energy: 0.92, acousticness: 0.11, instrumentalness: 0.14, liveness: 0.35, speechiness: 0.10 },
       },
       {
@@ -301,6 +319,8 @@ export async function generateAIRecommendations(
         artist: 'David Guetta ft. Sia',
         album: 'Nothing but the Beat',
         cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120',
+        durationMs: 245000,
+        spotifyUrl: 'https://open.spotify.com/track/0yLdNVWF3Srea0uzk55zFn',
         features: { danceability: 0.82, valence: 0.80, energy: 0.95, acousticness: 0.08, instrumentalness: 0.18, liveness: 0.40, speechiness: 0.11 },
       },
       {
@@ -308,6 +328,8 @@ export async function generateAIRecommendations(
         artist: 'Macklemore & Ryan Lewis',
         album: 'The Heist',
         cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120',
+        durationMs: 257000,
+        spotifyUrl: 'https://open.spotify.com/track/3bidbhpOYeV8SoJLdo7d2X',
         features: { danceability: 0.90, valence: 0.88, energy: 0.96, acousticness: 0.09, instrumentalness: 0.12, liveness: 0.42, speechiness: 0.14 },
       },
       {
@@ -315,6 +337,8 @@ export async function generateAIRecommendations(
         artist: 'Paper Planes',
         album: 'Bad Boy Single',
         cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=120',
+        durationMs: 218000,
+        spotifyUrl: 'https://open.spotify.com/track/5kDMXHPY1ZnKMBzFAr4RiK',
         features: { danceability: 0.84, valence: 0.82, energy: 0.98, acousticness: 0.06, instrumentalness: 0.10, liveness: 0.39, speechiness: 0.13 },
       },
       {
@@ -322,6 +346,8 @@ export async function generateAIRecommendations(
         artist: 'Dua Lipa',
         album: 'Future Nostalgia',
         cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120',
+        durationMs: 203000,
+        spotifyUrl: 'https://open.spotify.com/track/39LLxExYz6ewLAcYrzQQyP',
         features: { danceability: 0.89, valence: 0.90, energy: 0.90, acousticness: 0.08, instrumentalness: 0.12, liveness: 0.36, speechiness: 0.11 },
       },
       {
@@ -329,6 +355,8 @@ export async function generateAIRecommendations(
         artist: 'The Weeknd ft. Daft Punk',
         album: 'Starboy',
         cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+        durationMs: 230000,
+        spotifyUrl: 'https://open.spotify.com/track/5aAx2yezTd8zXrkmtKl66Z',
         features: { danceability: 0.87, valence: 0.83, energy: 0.91, acousticness: 0.12, instrumentalness: 0.15, liveness: 0.34, speechiness: 0.10 },
       },
     ];
@@ -348,6 +376,8 @@ export async function generateAIRecommendations(
         artist: 'Stephen Sanchez',
         album: 'Easy on My Eyes',
         cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+        durationMs: 173000,
+        spotifyUrl: 'https://open.spotify.com/track/0nrRP00O4VFnEzBGFSlp5A',
         features: { danceability: 0.68, valence: 0.85, energy: 0.58, acousticness: 0.62, instrumentalness: 0.10, liveness: 0.26, speechiness: 0.06 },
       },
       {
@@ -355,6 +385,8 @@ export async function generateAIRecommendations(
         artist: 'JVKE',
         album: 'this is what ____ feels like',
         cover: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=120',
+        durationMs: 209000,
+        spotifyUrl: 'https://open.spotify.com/track/5odlY52u43F5BjByhxg7wg',
         features: { danceability: 0.70, valence: 0.88, energy: 0.64, acousticness: 0.52, instrumentalness: 0.14, liveness: 0.27, speechiness: 0.07 },
       },
       {
@@ -362,6 +394,8 @@ export async function generateAIRecommendations(
         artist: 'Taylor Swift',
         album: 'Lover',
         cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120',
+        durationMs: 221000,
+        spotifyUrl: 'https://open.spotify.com/track/1dGr1c8CrMLDpV6mPbImSI',
         features: { danceability: 0.74, valence: 0.90, energy: 0.60, acousticness: 0.58, instrumentalness: 0.11, liveness: 0.25, speechiness: 0.06 },
       },
       {
@@ -369,6 +403,8 @@ export async function generateAIRecommendations(
         artist: 'NONT TANONT',
         album: 'พิง Single',
         cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120',
+        durationMs: 235000,
+        spotifyUrl: 'https://open.spotify.com/track/3fcte2GVCzvFMsB17AKMSN',
         features: { danceability: 0.69, valence: 0.82, energy: 0.61, acousticness: 0.59, instrumentalness: 0.13, liveness: 0.29, speechiness: 0.07 },
       },
       {
@@ -376,6 +412,8 @@ export async function generateAIRecommendations(
         artist: 'Post Malone ft. Doja Cat',
         album: 'Twelve Carat Toothache',
         cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120',
+        durationMs: 198000,
+        spotifyUrl: 'https://open.spotify.com/track/3HWBw4h5XBzHTUQJIiJHU3',
         features: { danceability: 0.76, valence: 0.91, energy: 0.66, acousticness: 0.48, instrumentalness: 0.12, liveness: 0.30, speechiness: 0.08 },
       },
     ];
@@ -395,6 +433,8 @@ export async function generateAIRecommendations(
         artist: 'Marconi Union',
         album: 'Weightless (Ambient)',
         cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+        durationMs: 480000,
+        spotifyUrl: 'https://open.spotify.com/track/7ygpwy2qP3NbrxVkHvUhXY',
         features: { danceability: 0.42, valence: 0.45, energy: 0.32, acousticness: 0.82, instrumentalness: 0.96, liveness: 0.18, speechiness: 0.03 },
       },
       {
@@ -402,6 +442,8 @@ export async function generateAIRecommendations(
         artist: 'Ludovico Einaudi',
         album: 'In a Time Lapse',
         cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=120',
+        durationMs: 348000,
+        spotifyUrl: 'https://open.spotify.com/track/1BNC8I3tKCyd3gJMB0OUkX',
         features: { danceability: 0.46, valence: 0.50, energy: 0.45, acousticness: 0.74, instrumentalness: 0.93, liveness: 0.22, speechiness: 0.04 },
       },
       {
@@ -409,6 +451,8 @@ export async function generateAIRecommendations(
         artist: 'Hans Zimmer',
         album: 'Interstellar Soundtrack',
         cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120',
+        durationMs: 148000,
+        spotifyUrl: 'https://open.spotify.com/track/2igwFfmr1UkRBe8YEpFMTO',
         features: { danceability: 0.43, valence: 0.47, energy: 0.42, acousticness: 0.72, instrumentalness: 0.95, liveness: 0.21, speechiness: 0.04 },
       },
       {
@@ -416,6 +460,8 @@ export async function generateAIRecommendations(
         artist: 'Claude Debussy',
         album: 'Suite bergamasque',
         cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120',
+        durationMs: 292000,
+        spotifyUrl: 'https://open.spotify.com/track/2RlgNHKcydI9sayD2Df2xp',
         features: { danceability: 0.40, valence: 0.44, energy: 0.28, acousticness: 0.88, instrumentalness: 0.98, liveness: 0.19, speechiness: 0.03 },
       },
       {
@@ -423,6 +469,8 @@ export async function generateAIRecommendations(
         artist: 'Django Reinhardt',
         album: 'Djangology',
         cover: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=120',
+        durationMs: 198000,
+        spotifyUrl: 'https://open.spotify.com/track/4Bp7cFVRgRBBiEuRW8BQXF',
         features: { danceability: 0.48, valence: 0.52, energy: 0.36, acousticness: 0.80, instrumentalness: 0.92, liveness: 0.23, speechiness: 0.04 },
       },
     ];
@@ -442,6 +490,8 @@ export async function generateAIRecommendations(
         artist: 'John Denver',
         album: 'Poems, Prayers & Promises',
         cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+        durationMs: 191000,
+        spotifyUrl: 'https://open.spotify.com/track/1PgCNKbMvMUWjr5t5L1K9m',
         features: { danceability: 0.62, valence: 0.70, energy: 0.58, acousticness: 0.65, instrumentalness: 0.12, liveness: 0.30, speechiness: 0.06 },
       },
       {
@@ -449,6 +499,8 @@ export async function generateAIRecommendations(
         artist: 'พงษ์สิทธิ์ คำภีร์',
         album: 'เสือตัวที่ 11',
         cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120',
+        durationMs: 248000,
+        spotifyUrl: 'https://open.spotify.com/track/2J4EWgFatFYiuFXRRLVhMN',
         features: { danceability: 0.58, valence: 0.64, energy: 0.52, acousticness: 0.72, instrumentalness: 0.14, liveness: 0.31, speechiness: 0.05 },
       },
       {
@@ -456,6 +508,8 @@ export async function generateAIRecommendations(
         artist: 'Ed Sheeran',
         album: '÷ (Divide)',
         cover: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120',
+        durationMs: 261000,
+        spotifyUrl: 'https://open.spotify.com/track/6wafZDQHSKNAPXEMaEiDXY',
         features: { danceability: 0.64, valence: 0.72, energy: 0.65, acousticness: 0.60, instrumentalness: 0.10, liveness: 0.34, speechiness: 0.07 },
       },
       {
@@ -463,6 +517,8 @@ export async function generateAIRecommendations(
         artist: 'TaitosmitH',
         album: 'เพื่อชีวิตกู',
         cover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=120',
+        durationMs: 232000,
+        spotifyUrl: 'https://open.spotify.com/track/7LfaNmPIfGrB4EzfHUbLVY',
         features: { danceability: 0.59, valence: 0.66, energy: 0.60, acousticness: 0.66, instrumentalness: 0.16, liveness: 0.32, speechiness: 0.06 },
       },
     ];
@@ -483,6 +539,8 @@ export async function generateAIRecommendations(
         artist: 'Post Malone & Swae Lee',
         album: 'Spider-Man Soundtrack',
         cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120',
+        durationMs: 158000,
+        spotifyUrl: 'https://open.spotify.com/track/3KkXRkHbMCARz0aVfEt68P',
         features: { danceability: 0.72, valence: 0.68, energy: 0.52, acousticness: 0.58, instrumentalness: 0.45, liveness: 0.26, speechiness: 0.06 },
       },
       {
@@ -490,6 +548,8 @@ export async function generateAIRecommendations(
         artist: 'Maroon 5',
         album: 'Songs About Jane',
         cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120',
+        durationMs: 242000,
+        spotifyUrl: 'https://open.spotify.com/track/3hRV0jL3vUpRrcy398teAU',
         features: { danceability: 0.66, valence: 0.70, energy: 0.48, acousticness: 0.60, instrumentalness: 0.50, liveness: 0.28, speechiness: 0.05 },
       },
       {
@@ -497,6 +557,8 @@ export async function generateAIRecommendations(
         artist: 'คณะขวัญใจ',
         album: 'คณะขวัญใจ',
         cover: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=120',
+        durationMs: 225000,
+        spotifyUrl: 'https://open.spotify.com/track/3fcte2GVCzvFMsB17AKMSN',
         features: { danceability: 0.64, valence: 0.62, energy: 0.46, acousticness: 0.70, instrumentalness: 0.58, liveness: 0.27, speechiness: 0.05 },
       },
       {
@@ -504,6 +566,8 @@ export async function generateAIRecommendations(
         artist: 'beabadoobee',
         album: 'Patched Up',
         cover: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=120',
+        durationMs: 141000,
+        spotifyUrl: 'https://open.spotify.com/track/3PfIrDoz19wz7qK7tYeu62',
         features: { danceability: 0.62, valence: 0.60, energy: 0.42, acousticness: 0.75, instrumentalness: 0.62, liveness: 0.24, speechiness: 0.05 },
       },
       {
@@ -511,6 +575,8 @@ export async function generateAIRecommendations(
         artist: 'Jack Johnson',
         album: 'In Between Dreams',
         cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=120',
+        durationMs: 193000,
+        spotifyUrl: 'https://open.spotify.com/track/2FLMq3aVqPTmNLMWyDdVHA',
         features: { danceability: 0.67, valence: 0.72, energy: 0.47, acousticness: 0.66, instrumentalness: 0.48, liveness: 0.29, speechiness: 0.06 },
       },
     ];
@@ -533,6 +599,8 @@ export async function generateAIRecommendations(
       artistName: song.artist,
       albumName: song.album,
       albumCoverUrl: song.cover,
+      durationMs: song.durationMs,
+      spotifyUrl: song.spotifyUrl,
       audioFeatures: song.features,
       matchScore,
     };
