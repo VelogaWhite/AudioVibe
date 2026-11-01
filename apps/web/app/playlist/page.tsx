@@ -15,6 +15,7 @@ import {
   Share2,
   RefreshCw,
   Check,
+  Sparkles,
 } from 'lucide-react';
 import {
   usePlaylistStore,
@@ -28,7 +29,6 @@ import { AIPromptBox, PlaylistModifyAction } from '../../components/AIPromptBox'
 import { TrackItem } from '../../components/TrackItem';
 import { SearchSpotify } from '../../components/SearchSpotify';
 import { ExportSuccessModal } from '../../components/ExportSuccessModal';
-import { BackgroundVibe } from '../../components/BackgroundVibe';
 import {
   fetchUserProfile,
   fetchPlaylists,
@@ -46,12 +46,241 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
 }
 
+interface MoodGlowPalette {
+  id: string;
+  label: string;
+  accent: string;
+  glow: string;
+  strongGlow: string;
+  ring4: string;
+  ring3: string;
+  ring2: string;
+  ring1: string;
+  radialGradient: string;
+}
+
+const MOOD_PALETTES: Record<string, MoodGlowPalette> = {
+  RAINY: {
+    id: 'RAINY',
+    label: '🌧️ Rainy & Melancholy',
+    accent: '#38bdf8',
+    glow: 'rgba(56, 189, 248, 0.25)',
+    strongGlow: 'rgba(56, 189, 248, 0.65)',
+    ring4: '#bae6fd',
+    ring3: '#7dd3fc',
+    ring2: '#38bdf8',
+    ring1: '#0284c7',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(56, 189, 248, 0.65) 0%, rgba(56, 189, 248, 0.3) 14%, rgba(56, 189, 248, 0.14) 18%, rgba(56, 189, 248, 0.06) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+  FIRE: {
+    id: 'FIRE',
+    label: '🔥 High Energy & Party',
+    accent: '#ff5733',
+    glow: 'rgba(255, 87, 51, 0.25)',
+    strongGlow: 'rgba(255, 87, 51, 0.65)',
+    ring4: '#fed7aa',
+    ring3: '#fb923c',
+    ring2: '#f97316',
+    ring1: '#ea580c',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(255, 87, 51, 0.65) 0%, rgba(255, 87, 51, 0.3) 14%, rgba(255, 87, 51, 0.14) 18%, rgba(255, 87, 51, 0.06) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+  LOVE: {
+    id: 'LOVE',
+    label: '💖 Romantic & Love',
+    accent: '#ff4d94',
+    glow: 'rgba(255, 77, 148, 0.25)',
+    strongGlow: 'rgba(255, 77, 148, 0.65)',
+    ring4: '#fbcfe8',
+    ring3: '#f472b6',
+    ring2: '#ec4899',
+    ring1: '#db2777',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(255, 77, 148, 0.65) 0%, rgba(255, 77, 148, 0.3) 14%, rgba(255, 77, 148, 0.14) 18%, rgba(255, 77, 148, 0.06) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+  FOCUS: {
+    id: 'FOCUS',
+    label: '🎯 Deep Focus',
+    accent: '#a855f7',
+    glow: 'rgba(168, 85, 247, 0.25)',
+    strongGlow: 'rgba(168, 85, 247, 0.65)',
+    ring4: '#e9d5ff',
+    ring3: '#c084fc',
+    ring2: '#a855f7',
+    ring1: '#7e22ce',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(168, 85, 247, 0.65) 0%, rgba(168, 85, 247, 0.3) 14%, rgba(168, 85, 247, 0.14) 18%, rgba(168, 85, 247, 0.06) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+  HOME: {
+    id: 'HOME',
+    label: '🏡 Warm & Nostalgia',
+    accent: '#fbbf24',
+    glow: 'rgba(251, 191, 36, 0.24)',
+    strongGlow: 'rgba(251, 191, 36, 0.65)',
+    ring4: '#fde68a',
+    ring3: '#fcd34d',
+    ring2: '#fbbf24',
+    ring1: '#d97706',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0.28) 14%, rgba(251, 191, 36, 0.14) 18%, rgba(251, 191, 36, 0.05) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+  NATURE: {
+    id: 'NATURE',
+    label: '🍃 Chill & Relax',
+    accent: '#1ed760',
+    glow: 'rgba(30, 215, 96, 0.24)',
+    strongGlow: 'rgba(30, 215, 96, 0.65)',
+    ring4: '#bbf7d0',
+    ring3: '#4ade80',
+    ring2: '#22c55e',
+    ring1: '#15803d',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(30, 215, 96, 0.6) 0%, rgba(30, 215, 96, 0.28) 14%, rgba(30, 215, 96, 0.14) 18%, rgba(30, 215, 96, 0.05) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+  WHITE: {
+    id: 'WHITE',
+    label: '✨ Custom Vibe',
+    accent: '#ffffff',
+    glow: 'rgba(255, 255, 255, 0.22)',
+    strongGlow: 'rgba(255, 255, 255, 0.6)',
+    ring4: 'rgba(255, 255, 255, 0.85)',
+    ring3: 'rgba(255, 255, 255, 0.6)',
+    ring2: 'rgba(255, 255, 255, 0.35)',
+    ring1: 'rgba(255, 255, 255, 0.2)',
+    radialGradient:
+      'radial-gradient(circle at center 800px, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.25) 14%, rgba(255, 255, 255, 0.12) 18%, rgba(255, 255, 255, 0.05) 22%, rgba(10, 10, 12, 0.2) 25%)',
+  },
+};
+
+function resolveMoodPalette(
+  text: string,
+  features?: AudioFeatures | null,
+): MoodGlowPalette {
+  const combined = text.toLowerCase();
+
+  if (
+    /เหงา|เศร้า|ร้องไห้|อกหัก|ฝน|ซึ้ง|rain|sad|alone|lonely|melanchol|blue/i.test(
+      combined,
+    )
+  ) {
+    return MOOD_PALETTES.RAINY;
+  }
+  if (
+    /มัน|ตื๊ด|เต้น|ร็อก|ร็อค|rock|metal|punk|dance|club|party|ไฟ|fire|เบสหนัก|สุดเหวี่ยง|hip-hop|hiphop|edm|linkin|queen|nirvana/i.test(
+      combined,
+    )
+  ) {
+    return MOOD_PALETTES.FIRE;
+  }
+  if (
+    /คลั่งรัก|เพลงรัก|อินเลิฟ|โรแมนติก|romantic|วาเลนไทน์|\blove\b|หวาน|คู่รัก/i.test(
+      combined,
+    ) ||
+    (/รัก/i.test(combined) && !/น่ารัก|อนุรักษ์/i.test(combined))
+  ) {
+    return MOOD_PALETTES.LOVE;
+  }
+  if (
+    /สมาธิ|โฟกัส|อ่านหนังสือ|ทำงาน|focus|study|instrumental|ambient|บรรเลง/i.test(
+      combined,
+    )
+  ) {
+    return MOOD_PALETTES.FOCUS;
+  }
+  if (/กลับบ้าน|บ้าน|อบอุ่น|คิดถึง|nostalgia|home|warm|country|folk/i.test(combined)) {
+    return MOOD_PALETTES.HOME;
+  }
+  if (/ผ่อนคลาย|ชิล|สบาย|chill|relax|lofi|lo-fi|acoustic|ธรรมชาติ/i.test(combined)) {
+    return MOOD_PALETTES.NATURE;
+  }
+
+  // Fallback to 7D audio features if playlist name is generic
+  if (features) {
+    if (features.energy >= 0.72) return MOOD_PALETTES.FIRE;
+    if (features.instrumentalness >= 0.45) return MOOD_PALETTES.FOCUS;
+    if (features.valence <= 0.38) return MOOD_PALETTES.RAINY;
+    if (features.valence >= 0.68 && features.danceability >= 0.6)
+      return MOOD_PALETTES.LOVE;
+    if (features.acousticness >= 0.6) return MOOD_PALETTES.NATURE;
+  }
+
+  return MOOD_PALETTES.NATURE;
+}
+
+// Bolt-style Curved Glowing Horizon Background WITHOUT Vinyl Record (adapts color to playlist mood)
+function MoodHorizonBackground({ palette }: { palette: MoodGlowPalette }) {
+  return (
+    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
+      <div className="absolute inset-0 bg-[#0a0a0c]" />
+
+      {/* Dynamic Mood Radial Glow */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 w-[4000px] h-[1800px] sm:w-[6000px] transition-all duration-700"
+        style={{
+          background: palette.radialGradient,
+        }}
+      />
+
+      {/* Glowing Horizon Arc (No Vinyl Image inside) */}
+      <div
+        className="absolute top-[220px] left-1/2 w-[1600px] h-[1600px] sm:top-[54%] sm:w-[3043px] sm:h-[2865px]"
+        style={{ transform: 'translate(-50%) rotate(180deg)' }}
+      >
+        <div
+          className="absolute w-full h-full rounded-full -mt-[13px] transition-all duration-700"
+          style={{
+            background:
+              'radial-gradient(43.89% 25.74% at 50.02% 97.24%, #111115 0%, #0a0a0c 100%)',
+            border: '14px solid #ffffff',
+            transform: 'rotate(180deg)',
+            zIndex: 5,
+          }}
+        />
+        <div
+          className="absolute w-full h-full rounded-full bg-[#0a0a0c] -mt-[11px] transition-all duration-700"
+          style={{
+            border: `23px solid ${palette.ring4}`,
+            transform: 'rotate(180deg)',
+            zIndex: 4,
+          }}
+        />
+        <div
+          className="absolute w-full h-full rounded-full bg-[#0a0a0c] -mt-[8px] transition-all duration-700"
+          style={{
+            border: `23px solid ${palette.ring3}`,
+            transform: 'rotate(180deg)',
+            zIndex: 3,
+          }}
+        />
+        <div
+          className="absolute w-full h-full rounded-full bg-[#0a0a0c] -mt-[4px] transition-all duration-700"
+          style={{
+            border: `23px solid ${palette.ring2}`,
+            transform: 'rotate(180deg)',
+            zIndex: 2,
+          }}
+        />
+        <div
+          className="absolute w-full h-full rounded-full bg-[#0a0a0c] transition-all duration-700"
+          style={{
+            border: `20px solid ${palette.ring1}`,
+            boxShadow: `0 -18px 45px ${palette.strongGlow}`,
+            transform: 'rotate(180deg)',
+            zIndex: 1,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 const AudioRadarChart = dynamic(
   () => import('../../components/RadarChart').then((mod) => mod.AudioRadarChart),
   {
     ssr: false,
     loading: () => (
-      <div className="flex-1 flex items-center justify-center bg-[#121d17]/80 rounded-2xl border border-[#234230] text-[#70947e] text-xs animate-pulse">
+      <div className="flex-1 flex items-center justify-center bg-[#121216]/75 rounded-2xl border border-white/15 text-white/50 text-xs animate-pulse backdrop-blur-xl">
         กำลังโหลดกราฟเรดาร์ 7 มิติเสียง...
       </div>
     ),
@@ -64,7 +293,6 @@ export default function PlaylistDetailPage() {
     currentPlaylist,
     playlists,
     tracks,
-    themeVibe,
     setPlaylist,
     setPlaylists,
     setMode,
@@ -88,6 +316,7 @@ export default function PlaylistDetailPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [aiFeatures, setAiFeatures] = useState<AudioFeatures | null>(null);
+  const [lastPromptText, setLastPromptText] = useState<string>('');
   const [statusMessage, setStatusMessage] = useState<string>('พร้อมใช้งาน');
 
   const effectiveRadarFeatures = useMemo<AudioFeatures | null>(() => {
@@ -128,6 +357,12 @@ export default function PlaylistDetailPage() {
       speechiness: sum.speechiness / count,
     };
   }, [aiFeatures, tracks]);
+
+  // Dynamic Mood Glow Palette resolved from current playlist name, latest prompt, or 7D audio features
+  const moodPalette = useMemo<MoodGlowPalette>(() => {
+    const sourceText = `${lastPromptText} ${currentPlaylist?.name || ''}`;
+    return resolveMoodPalette(sourceText, effectiveRadarFeatures);
+  }, [lastPromptText, currentPlaylist?.name, effectiveRadarFeatures]);
 
   const loadInitialData = useCallback(async () => {
     let activeUserId: string | undefined = undefined;
@@ -171,7 +406,6 @@ export default function PlaylistDetailPage() {
         null;
 
       if (target) {
-        // Restore cached matchScores / aiFeatures from sessionStorage if available
         let cachedScores: Record<string, number> = {};
         if (typeof window !== 'undefined') {
           try {
@@ -206,6 +440,7 @@ export default function PlaylistDetailPage() {
   }, [loadInitialData]);
 
   const applyThemeFromPrompt = (promptText: string, presetLabel?: string) => {
+    setLastPromptText(`${presetLabel || ''} ${promptText}`);
     let themeToSet: ThemeVibe = 'NATURE';
     if (presetLabel) {
       if (presetLabel.includes('รัก')) {
@@ -260,6 +495,7 @@ export default function PlaylistDetailPage() {
     if (selected) {
       setPlaylist(selected);
       setAiFeatures(null);
+      setLastPromptText('');
       setMode('AI_ANALYTICS');
       setStatusMessage(`กำลังเปิดเพลย์ลิสต์ "${selected.name}"`);
     }
@@ -356,7 +592,7 @@ export default function PlaylistDetailPage() {
     }
   };
 
-  // Page 4 AI Smart Recommend: Replace or Add tracks in currentPlaylist
+  // Page 4 Smart Custom Playlist: Replace or Add tracks in currentPlaylist
   const handleAIGenerate = async (
     promptText: string,
     presetLabel?: string,
@@ -500,8 +736,9 @@ export default function PlaylistDetailPage() {
     : '/studio';
 
   return (
-    <div className="h-screen flex relative transition-colors duration-700 overflow-hidden">
-      <BackgroundVibe theme={themeVibe} />
+    <div className="h-screen flex relative transition-colors duration-700 overflow-hidden bg-[#0a0a0c]">
+      {/* Bolt-Style Horizon Background with Dynamic Mood Glow (No Vinyl Record) */}
+      <MoodHorizonBackground palette={moodPalette} />
 
       <Sidebar
         isOpen={isSidebarOpen}
@@ -514,36 +751,34 @@ export default function PlaylistDetailPage() {
         onExportPlaylist={handleExport}
         onRefreshPlaylists={loadInitialData}
         isExporting={isExporting}
+        accentColor={moodPalette.accent}
+        accentGlow={moodPalette.glow}
       />
 
       {/* Right Content Area: Fits 100% inside 1 screen (h-screen overflow-hidden) */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10 px-5 py-3">
-        {/* Compact Top Header with User Profile at Top-Right */}
-        <header className="flex items-center justify-between gap-4 pb-2.5 mb-3 border-b border-[#1b3a2a] shrink-0">
-          <div className="flex items-center gap-3">
-            <Link
-              href={backToStudioHref}
-              className="flex items-center gap-2 text-[#7fa38c] hover:text-white transition-colors"
-              title="กลับหน้าสร้างเพลย์ลิสต์ใหม่"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1ed760] to-[#0f6832] flex items-center justify-center shadow shadow-[#1ed760]/20">
-                <Music className="w-4 h-4 text-[#05160b]" />
-              </div>
-              <div>
-                <h1 className="text-lg font-extrabold text-white tracking-tight">
-                  Audio<span className="text-[#1ed760]">Vibe</span> Studio
-                </h1>
-                <p className="text-[11px] text-[#82a691] truncate max-w-md">
-                  {statusMessage}
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Compact Top Header with Mood Badge & User Profile at Top-Right */}
+        <header className="flex items-center justify-end gap-3 pb-2 shrink-0">
+          <span
+            style={{
+              color: moodPalette.accent,
+              borderColor: `${moodPalette.accent}45`,
+              backgroundColor: `${moodPalette.accent}15`,
+              boxShadow: `0 0 14px ${moodPalette.glow}`,
+            }}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-500"
+          >
+            <Sparkles className="w-3 h-3" />
+            {moodPalette.label}
+          </span>
 
-          <div className="flex items-center gap-2.5 bg-[#121f18]/95 border border-[#234230] rounded-2xl px-3.5 py-2 shadow-lg backdrop-blur">
+          <div
+            style={{
+              borderColor: `${moodPalette.accent}35`,
+              boxShadow: `0 0 18px ${moodPalette.glow}`,
+            }}
+            className="flex items-center gap-2.5 bg-[#141418]/85 border rounded-2xl px-3.5 py-2 backdrop-blur-xl transition-all duration-500"
+          >
             <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1b3827] border-2 border-[#1ed760] shrink-0">
               {user?.profileImageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -553,7 +788,7 @@ export default function PlaylistDetailPage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#558367]">
+                <div className="w-full h-full flex items-center justify-center text-white/50">
                   <UserIcon className="w-4 h-4" />
                 </div>
               )}
@@ -562,9 +797,6 @@ export default function PlaylistDetailPage() {
               <h3 className="text-xs font-bold text-white truncate max-w-[160px]">
                 {user?.displayName || 'กำลังโหลด...'}
               </h3>
-              <p className="text-[10px] text-[#82a691] truncate font-mono max-w-[180px]">
-                Spotify: {user?.spotifyId || 'unknown'}
-              </p>
             </div>
           </div>
         </header>
@@ -574,9 +806,18 @@ export default function PlaylistDetailPage() {
           {/* LEFT COLUMN: Current Playlist Summary + 7-Axis Radar Profile + Target Stat Table */}
           <div className="w-full lg:w-[34%] h-full min-h-0 flex flex-col gap-2.5 overflow-hidden">
             {/* 1. Compact Current Playlist Summary Card */}
-            <section className="shrink-0 bg-[#121f18]/90 border border-[#234230] rounded-2xl p-3.5 shadow-lg backdrop-blur flex flex-col gap-2.5">
-              <div className="flex items-center gap-2 pb-1.5 border-b border-[#1f3a2b]">
-                <ListMusic className="w-4 h-4 text-[#1ed760]" />
+            <section
+              style={{
+                borderColor: `${moodPalette.accent}38`,
+                boxShadow: `0 0 28px ${moodPalette.glow}, 0 8px 30px rgba(0,0,0,0.5)`,
+              }}
+              className="shrink-0 bg-[#121216]/75 border rounded-2xl p-3.5 backdrop-blur-xl flex flex-col gap-2.5 transition-all duration-500"
+            >
+              <div className="flex items-center gap-2 pb-1.5 border-b border-white/10">
+                <ListMusic
+                  style={{ color: moodPalette.accent }}
+                  className="w-4 h-4 transition-colors duration-500"
+                />
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">
                   Current Playlist Summary
                 </h3>
@@ -586,14 +827,14 @@ export default function PlaylistDetailPage() {
                 <div className="text-sm font-bold text-white truncate">
                   {currentPlaylist?.name || 'กำลังโหลดเพลย์ลิสต์...'}
                 </div>
-                <div className="text-[11px] text-[#82a691] shrink-0 flex items-center gap-1.5">
+                <div className="text-[11px] text-white/60 shrink-0 flex items-center gap-1.5">
                   <span>{tracks.length} เพลง</span>
                   <span>•</span>
                   <span
                     className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                       currentPlaylist?.isExported
-                        ? 'bg-[#1b432c] text-[#1ed760]'
-                        : 'bg-[#2a291e] text-[#e0b84c]'
+                        ? 'bg-[#1ed760]/20 text-[#1ed760] border border-[#1ed760]/30'
+                        : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
                     }`}
                   >
                     {currentPlaylist?.isExported
@@ -607,7 +848,7 @@ export default function PlaylistDetailPage() {
                 <button
                   type="button"
                   onClick={() => handleRenamePlaylist(currentPlaylist || undefined)}
-                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-[#1a2d21] hover:bg-[#223d2c] border border-[#2a4d38] text-xs text-[#c2e2ce] font-medium transition-all"
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-xs text-white/85 font-medium transition-all cursor-pointer"
                 >
                   <Edit2 className="w-3 h-3" />
                   <span>Rename</span>
@@ -615,7 +856,7 @@ export default function PlaylistDetailPage() {
                 <button
                   type="button"
                   onClick={() => handleDeletePlaylist(currentPlaylist || undefined)}
-                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-[#2b1717] hover:bg-[#3d1f1f] border border-[#522929] text-xs text-[#ff9999] font-medium transition-all"
+                  className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs text-[#ff9999] font-medium transition-all cursor-pointer"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>Delete</span>
@@ -626,7 +867,7 @@ export default function PlaylistDetailPage() {
                 type="button"
                 onClick={() => handleExport(currentPlaylist || undefined)}
                 disabled={tracks.length === 0 || isExporting}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs bg-[#1ed760] hover:bg-[#1db954] text-[#06140a] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md hover:shadow-[#1ed760]/25"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-xs bg-[#1ed760] hover:bg-[#1db954] text-[#06140a] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(30,215,96,0.3)] cursor-pointer"
               >
                 {isExporting ? (
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -648,27 +889,47 @@ export default function PlaylistDetailPage() {
             <AudioRadarChart
               features={effectiveRadarFeatures}
               title="7-Axis Audio Vibe Vector Profile"
+              accentColor={moodPalette.accent}
+              accentGlow={moodPalette.glow}
             />
           </div>
 
-          {/* RIGHT COLUMN: AI Smart Recommend (Modify Mode) + Scrollable Track List + Search & Add Tracks */}
+          {/* RIGHT COLUMN: Smart Custom Playlist (Modify Mode) + Scrollable Track List + Search & Add Tracks */}
           <div className="w-full lg:w-[66%] h-full min-h-0 flex flex-col gap-2.5 overflow-hidden">
-            {/* 1. AI Smart Recommend (Modify Mode) */}
+            {/* 1. Smart Custom Playlist (Modify Mode) */}
             <AIPromptBox
               mode="modify"
               onGenerate={handleAIGenerate}
               isLoading={isGenerating}
+              accentColor={moodPalette.accent}
+              accentGlow={moodPalette.glow}
             />
 
             {/* 2. Current Playlist Tracks (Fills middle height & scrolls internally, ~5 tracks visible) */}
-            <section className="flex-1 min-h-0 bg-[#121f18]/90 border border-[#234230] rounded-2xl p-3 shadow-lg backdrop-blur flex flex-col overflow-hidden">
-              <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-[#1f3a2b] shrink-0">
+            <section
+              style={{
+                borderColor: `${moodPalette.accent}38`,
+                boxShadow: `0 0 28px ${moodPalette.glow}, 0 8px 30px rgba(0,0,0,0.5)`,
+              }}
+              className="flex-1 min-h-0 bg-[#121216]/75 border rounded-2xl p-3 backdrop-blur-xl flex flex-col overflow-hidden transition-all duration-500"
+            >
+              <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-white/10 shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
-                  <ListMusic className="w-4 h-4 text-[#1ed760] shrink-0" />
+                  <ListMusic
+                    style={{ color: moodPalette.accent }}
+                    className="w-4 h-4 shrink-0 transition-colors duration-500"
+                  />
                   <h3 className="text-xs font-bold text-white truncate">
                     {currentPlaylist?.name || 'Playlist Tracks'}
                   </h3>
-                  <span className="text-[10px] px-2 py-0 rounded-full bg-[#1b3628] text-[#86a894] shrink-0">
+                  <span
+                    style={{
+                      color: moodPalette.accent,
+                      borderColor: `${moodPalette.accent}40`,
+                      backgroundColor: `${moodPalette.accent}15`,
+                    }}
+                    className="text-[10px] px-2 py-0 rounded-full border shrink-0 font-medium"
+                  >
                     {tracks.length} เพลง
                   </span>
                 </div>
@@ -684,16 +945,17 @@ export default function PlaylistDetailPage() {
                       totalTracks={tracks.length}
                       onRemove={handleRemoveTrack}
                       onMove={handleReorderTracks}
+                      accentColor={moodPalette.accent}
                     />
                   ))
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center rounded-xl bg-[#0c1611]/60 border border-dashed border-[#1f3a2b] p-4">
-                    <BarChart3 className="w-6 h-6 text-[#3d634d] mb-1.5" />
-                    <p className="text-xs font-medium text-[#9eb7a8]">
+                  <div className="h-full flex flex-col items-center justify-center text-center rounded-xl bg-black/40 border border-dashed border-white/15 p-4">
+                    <BarChart3 className="w-6 h-6 text-white/30 mb-1.5" />
+                    <p className="text-xs font-medium text-white/70">
                       ยังไม่มีเพลงในเพลย์ลิสต์นี้
                     </p>
-                    <p className="text-[11px] text-[#5e7d6b] mt-0.5">
-                      ใช้กล่อง AI ด้านบนเพื่อเปลี่ยน/เพิ่มเพลง หรือค้นหาเพลงด้านล่างได้เลย
+                    <p className="text-[11px] text-white/40 mt-0.5">
+                      ใช้กล่อง Smart Custom Playlist ด้านบนเพื่อเปลี่ยน/เพิ่มเพลง หรือค้นหาเพลงด้านล่างได้เลย
                     </p>
                   </div>
                 )}
@@ -704,6 +966,8 @@ export default function PlaylistDetailPage() {
             <SearchSpotify
               onSearch={handleSearch}
               onAddTrack={handleAddTrack}
+              accentColor={moodPalette.accent}
+              accentGlow={moodPalette.glow}
             />
           </div>
         </main>

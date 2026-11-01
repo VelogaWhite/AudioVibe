@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Music,
-  Sparkles,
   ArrowLeft,
   User as UserIcon,
 } from 'lucide-react';
@@ -15,9 +14,8 @@ import {
   ThemeVibe,
 } from '../../store/usePlaylistStore';
 import { Sidebar } from '../../components/Sidebar';
-import { AIPromptBox } from '../../components/AIPromptBox';
+import { BoltStyleChat } from '../../components/ui/bolt-style-chat';
 import { ExportSuccessModal } from '../../components/ExportSuccessModal';
-import { BackgroundVibe } from '../../components/BackgroundVibe';
 import {
   fetchUserProfile,
   fetchPlaylists,
@@ -39,7 +37,6 @@ export default function StudioPromptPage() {
     currentPlaylist,
     playlists,
     tracks,
-    themeVibe,
     setPlaylist,
     setPlaylists,
     setMode,
@@ -236,7 +233,7 @@ export default function StudioPromptPage() {
     }
   };
 
-  // Generate new playlist on Page 3 and navigate to /studio/[playlistId] (Page 4)
+  // Generate new playlist on Page 3 and navigate to /playlist (Page 4)
   const handleAIGenerate = async (promptText: string, presetLabel?: string) => {
     setIsGenerating(true);
     setStatusMessage('กำลังวิเคราะห์อารมณ์และสกัด 7 มิติเสียงด้วย AI...');
@@ -296,9 +293,7 @@ export default function StudioPromptPage() {
   };
 
   return (
-    <div className="h-screen flex relative transition-colors duration-700 overflow-hidden">
-      <BackgroundVibe theme={themeVibe} />
-
+    <div className="h-screen flex relative overflow-hidden bg-[#0a0a0c]">
       <Sidebar
         isOpen={isSidebarOpen}
         onToggle={() => setIsSidebarOpen((prev) => !prev)}
@@ -312,31 +307,10 @@ export default function StudioPromptPage() {
         isExporting={isExporting}
       />
 
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10 px-6 py-4">
-        {/* Top Header with User Profile at Top-Right */}
-        <header className="flex items-center justify-between gap-4 pb-3 border-b border-[#1b3a2a] shrink-0">
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-[#7fa38c] hover:text-white transition-colors"
-              title="กลับหน้าแรก"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1ed760] to-[#0f6832] flex items-center justify-center shadow shadow-[#1ed760]/20">
-                <Music className="w-4 h-4 text-[#05160b]" />
-              </div>
-              <div>
-                <h1 className="text-lg font-extrabold text-white tracking-tight">
-                  Audio<span className="text-[#1ed760]">Vibe</span> Studio
-                </h1>
-                <p className="text-[11px] text-[#82a691]">{statusMessage}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 bg-[#121f18]/95 border border-[#234230] rounded-2xl px-3.5 py-2 shadow-lg backdrop-blur">
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative z-10">
+        {/* Top Floating Header with User Profile at Top-Right */}
+        <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-end gap-4 px-6 py-4 pointer-events-none">
+          <div className="flex items-center gap-2.5 bg-[#141418]/85 border border-white/15 rounded-2xl px-3.5 py-2 shadow-lg backdrop-blur-md pointer-events-auto">
             <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1b3827] border-2 border-[#1ed760] shrink-0">
               {user?.profileImageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -355,32 +329,20 @@ export default function StudioPromptPage() {
               <h3 className="text-xs font-bold text-white truncate max-w-[160px]">
                 {user?.displayName || 'กำลังโหลด...'}
               </h3>
-              <p className="text-[10px] text-[#82a691] truncate font-mono max-w-[180px]">
-                Spotify: {user?.spotifyId || 'unknown'}
-              </p>
             </div>
           </div>
         </header>
 
-        {/* PAGE 3: Gemini-style Centered AI Prompt View */}
-        <main className="flex-1 flex flex-col items-center justify-center max-w-3xl w-full mx-auto">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#132c1f] border border-[#214f34] text-[#1ed760] text-xs font-semibold mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>AI Playlist Generator</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">
-              เราจะเริ่มจากอารมณ์ไหนก่อนดี?
-            </h2>
-            <p className="text-sm text-[#86a894]">
-              พิมพ์บอกอารมณ์หรือเลือก Mood Preset ด้านล่างเพื่อสร้างเพลย์ลิสต์ใหม่ หรือคลิกเลือกเพลย์ลิสต์เดิมจากแถบด้านซ้าย
-            </p>
-          </div>
-
-          <AIPromptBox
-            mode="create"
-            onGenerate={handleAIGenerate}
+        {/* PAGE 3: Bolt-Style AI Chat with White Glow & Vinyl Horizon */}
+        <main className="flex-1 w-full h-full">
+          <BoltStyleChat
+            titlePrefix="Play Music with"
+            titleHighlight="Your Style"
+            announcementText="AI Playlist Generator"
+            subtitle="พิมพ์บอกอารมณ์ แนวเพลง หรือเลือก Mood Preset ด้านล่างเพื่อสร้างเพลย์ลิสต์ใหม่ด้วย AI"
+            vinylImageSrc="/vinyl-bg.jpg"
             isLoading={isGenerating}
+            onGenerate={handleAIGenerate}
           />
         </main>
       </div>

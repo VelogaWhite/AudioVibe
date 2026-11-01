@@ -13,6 +13,8 @@ interface AIPromptBoxProps {
   ) => Promise<void>;
   isLoading?: boolean;
   mode?: 'create' | 'modify';
+  accentColor?: string;
+  accentGlow?: string;
 }
 
 const QUICK_MOOD_PRESETS = [
@@ -28,6 +30,8 @@ export function AIPromptBox({
   onGenerate,
   isLoading = false,
   mode = 'create',
+  accentColor = '#ffffff',
+  accentGlow = 'rgba(255, 255, 255, 0.25)',
 }: AIPromptBoxProps) {
   const [prompt, setPrompt] = useState('');
   const [activePreset, setActivePreset] = useState<string | null>(null);
@@ -57,17 +61,27 @@ export function AIPromptBox({
 
   return (
     <div
-      className={`bg-[#121f18]/90 border border-[#234230] rounded-2xl ${
-        isCompact ? 'p-2.5' : 'p-5'
-      } shadow-lg backdrop-blur relative overflow-hidden w-full shrink-0`}
+      style={{
+        borderColor: `${accentColor}38`,
+        boxShadow: `0 0 28px ${accentGlow}, 0 8px 30px rgba(0,0,0,0.5)`,
+      }}
+      className={`bg-[#121216]/75 border rounded-2xl ${
+        isCompact ? 'p-3' : 'p-5'
+      } backdrop-blur-xl relative overflow-hidden w-full shrink-0 transition-all duration-500`}
     >
       {isLoading && (
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1ed760]/5 via-transparent to-[#1ed760]/5 animate-pulse pointer-events-none rounded-2xl" />
+        <div
+          style={{
+            background: `linear-gradient(90deg, transparent, ${accentColor}15, transparent)`,
+          }}
+          className="absolute inset-0 animate-pulse pointer-events-none rounded-2xl"
+        />
       )}
 
-      <div className={`flex items-center gap-2 ${isCompact ? 'mb-1.5' : 'mb-3'}`}>
+      <div className={`flex items-center gap-2 ${isCompact ? 'mb-2' : 'mb-3'}`}>
         <Wand2
-          className={`${isCompact ? 'w-3.5 h-3.5' : 'w-5 h-5'} text-[#1ed760] ${
+          style={{ color: accentColor }}
+          className={`${isCompact ? 'w-3.5 h-3.5' : 'w-5 h-5'} transition-colors duration-500 ${
             isLoading ? 'animate-spin' : 'animate-pulse'
           }`}
         />
@@ -76,10 +90,13 @@ export function AIPromptBox({
             isCompact ? 'text-xs' : 'text-base'
           } font-bold text-white tracking-wide`}
         >
-          AI Smart Recommend
+          Smart Custom Playlist
         </h2>
         {isLoading && (
-          <span className="text-[11px] text-[#7bc99a] animate-pulse ml-auto">
+          <span
+            style={{ color: accentColor }}
+            className="text-[11px] animate-pulse ml-auto"
+          >
             กำลังวิเคราะห์อารมณ์...
           </span>
         )}
@@ -87,7 +104,7 @@ export function AIPromptBox({
 
       <form
         onSubmit={handleSubmit}
-        className={`flex gap-2 ${isCompact ? 'mb-1.5' : 'mb-4'}`}
+        className={`flex gap-2 ${isCompact ? 'mb-2' : 'mb-4'}`}
       >
         <input
           type="text"
@@ -102,16 +119,20 @@ export function AIPromptBox({
               : "บอกอารมณ์ด้วยภาษาธรรมชาติ เช่น 'ชิลๆ ขับรถตอนกลางคืน' หรือ 'เศร้าอยู่คนเดียว'..."
           }
           disabled={isLoading}
-          className={`flex-1 bg-[#0b1410] border border-[#2c4d3a] rounded-xl px-3 ${
+          className={`flex-1 bg-[#0b0b0f]/90 border border-white/15 rounded-xl px-3.5 ${
             isCompact ? 'py-1.5 text-xs' : 'py-3 text-sm'
-          } text-white placeholder-[#688a75] focus:outline-none focus:border-[#1ed760] focus:ring-1 focus:ring-[#1ed760]/40 transition-all disabled:opacity-50`}
+          } text-white placeholder-white/40 focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/30 transition-all disabled:opacity-50`}
         />
         <button
           type="submit"
           disabled={!prompt.trim() || isLoading}
-          className={`flex items-center justify-center gap-1.5 px-3.5 ${
+          style={{
+            backgroundColor: accentColor,
+            boxShadow: `0 0 20px ${accentGlow}`,
+          }}
+          className={`flex items-center justify-center gap-1.5 px-4 ${
             isCompact ? 'py-1.5 text-xs' : 'py-3 text-sm'
-          } rounded-xl bg-[#1ed760] hover:bg-[#1db954] active:scale-95 text-[#06140a] font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-[#1ed760]/30 shrink-0`}
+          } rounded-xl hover:opacity-90 active:scale-95 text-[#0a0a0c] font-bold transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shrink-0 cursor-pointer`}
         >
           {isLoading ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -132,7 +153,7 @@ export function AIPromptBox({
 
       {mode === 'create' ? (
         <div>
-          <div className="text-xs font-semibold text-[#86a894] mb-2.5 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="text-xs font-semibold text-white/60 mb-2.5 uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3 h-3" />
             Quick Mood Presets
           </div>
@@ -145,11 +166,11 @@ export function AIPromptBox({
                   type="button"
                   onClick={() => handlePresetClick(preset)}
                   disabled={isLoading}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-all duration-200 disabled:opacity-40
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-all duration-200 disabled:opacity-40 cursor-pointer
                     ${
                       isActive
-                        ? 'bg-[#1ed760]/20 border-[#1ed760]/60 text-[#1ed760] font-semibold shadow-sm shadow-[#1ed760]/10'
-                        : `bg-[#16291f] border-[#264734] text-[#c2e2ce] ${preset.color}`
+                        ? 'bg-white/20 border-white/60 text-white font-semibold'
+                        : `bg-white/[0.06] border-white/15 text-white/80 ${preset.color}`
                     }`}
                 >
                   {preset.label}
@@ -165,10 +186,20 @@ export function AIPromptBox({
             type="button"
             onClick={() => handleModifyActionClick('replace')}
             disabled={isLoading}
-            className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-[11px] font-bold transition-all disabled:opacity-40 ${
+            style={
               modifyAction === 'replace'
-                ? 'bg-[#1ed760]/20 border-[#1ed760] text-[#1ed760] shadow-sm shadow-[#1ed760]/10'
-                : 'bg-[#16291f] border-[#264734] text-[#c2e2ce] hover:border-[#1ed760]/50 hover:text-white'
+                ? {
+                    borderColor: accentColor,
+                    color: accentColor,
+                    backgroundColor: `${accentColor}1a`,
+                    boxShadow: `0 0 16px ${accentGlow}`,
+                  }
+                : undefined
+            }
+            className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-[11px] font-bold transition-all duration-300 disabled:opacity-40 cursor-pointer ${
+              modifyAction === 'replace'
+                ? ''
+                : 'bg-white/[0.05] border-white/15 text-white/75 hover:border-white/40 hover:text-white'
             }`}
           >
             <RefreshCw className="w-3 h-3" />
@@ -179,10 +210,20 @@ export function AIPromptBox({
             type="button"
             onClick={() => handleModifyActionClick('add')}
             disabled={isLoading}
-            className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-[11px] font-bold transition-all disabled:opacity-40 ${
+            style={
               modifyAction === 'add'
-                ? 'bg-[#1ed760]/20 border-[#1ed760] text-[#1ed760] shadow-sm shadow-[#1ed760]/10'
-                : 'bg-[#16291f] border-[#264734] text-[#c2e2ce] hover:border-[#1ed760]/50 hover:text-white'
+                ? {
+                    borderColor: accentColor,
+                    color: accentColor,
+                    backgroundColor: `${accentColor}1a`,
+                    boxShadow: `0 0 16px ${accentGlow}`,
+                  }
+                : undefined
+            }
+            className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-[11px] font-bold transition-all duration-300 disabled:opacity-40 cursor-pointer ${
+              modifyAction === 'add'
+                ? ''
+                : 'bg-white/[0.05] border-white/15 text-white/75 hover:border-white/40 hover:text-white'
             }`}
           >
             <PlusCircle className="w-3 h-3" />

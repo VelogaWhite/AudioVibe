@@ -7,6 +7,8 @@ import { Track } from '../store/usePlaylistStore';
 interface SearchSpotifyProps {
   onSearch: (query: string) => Promise<Track[]>;
   onAddTrack: (track: Track) => Promise<void>;
+  accentColor?: string;
+  accentGlow?: string;
 }
 
 function formatDuration(ms: number): string {
@@ -16,7 +18,12 @@ function formatDuration(ms: number): string {
   return `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
+export function SearchSpotify({
+  onSearch,
+  onAddTrack,
+  accentColor = '#ffffff',
+  accentGlow = 'rgba(255, 255, 255, 0.2)',
+}: SearchSpotifyProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Track[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -58,13 +65,22 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
   };
 
   return (
-    <section className="flex-1 min-h-0 bg-[#121f18]/90 border border-[#234230] rounded-2xl p-3 shadow-lg backdrop-blur flex flex-col overflow-hidden">
+    <section
+      style={{
+        borderColor: `${accentColor}38`,
+        boxShadow: `0 0 28px ${accentGlow}, 0 8px 30px rgba(0,0,0,0.5)`,
+      }}
+      className="flex-1 min-h-0 bg-[#121216]/75 border rounded-2xl p-3 backdrop-blur-xl flex flex-col overflow-hidden transition-all duration-500"
+    >
       <div className="flex items-center gap-2 mb-1.5 shrink-0">
-        <Search className="w-3.5 h-3.5 text-[#1ed760]" />
+        <Search
+          style={{ color: accentColor }}
+          className="w-3.5 h-3.5 transition-colors duration-500"
+        />
         <h3 className="text-xs font-bold text-white uppercase tracking-wider">
           Search &amp; Add Tracks
         </h3>
-        <span className="text-[10px] px-2 py-0 rounded-full bg-[#1b3b29] text-[#82a691] border border-[#234230]">
+        <span className="text-[10px] px-2 py-0 rounded-full bg-white/[0.08] text-white/75 border border-white/15">
           Manual
         </span>
       </div>
@@ -75,12 +91,16 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="ค้นหาชื่อเพลง ศิลปิน หรืออัลบั้ม..."
-          className="flex-1 bg-[#0b1410] border border-[#2c4d3a] rounded-xl px-3 py-1.5 text-xs text-white placeholder-[#688a75] focus:outline-none focus:border-[#1ed760] focus:ring-1 focus:ring-[#1ed760]/40 transition-all"
+          className="flex-1 bg-[#0b0b0f]/90 border border-white/15 rounded-xl px-3.5 py-1.5 text-xs text-white placeholder-white/40 focus:outline-none focus:border-white/50 focus:ring-1 focus:ring-white/30 transition-all"
         />
         <button
           type="submit"
           disabled={!query.trim() || isSearching}
-          className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1ed760] hover:bg-[#1db954] active:scale-95 text-[#06140a] text-xs font-bold transition-all disabled:opacity-50 shadow-sm shrink-0"
+          style={{
+            backgroundColor: accentColor,
+            boxShadow: `0 0 18px ${accentGlow}`,
+          }}
+          className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl hover:opacity-90 active:scale-95 text-[#0a0a0c] text-xs font-bold transition-all duration-300 disabled:opacity-40 shrink-0 cursor-pointer"
         >
           {isSearching ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -94,7 +114,7 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
       </form>
 
       {errorMessage && (
-        <p className="mb-1.5 rounded-lg border border-[#6b3020] bg-[#2a1714] px-2.5 py-1 text-[11px] text-[#ffb09b] shrink-0">
+        <p className="mb-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1 text-[11px] text-red-300 shrink-0">
           {errorMessage}
         </p>
       )}
@@ -107,15 +127,23 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
             return (
               <div
                 key={track.id}
+                style={
+                  added
+                    ? {
+                        borderColor: `${accentColor}60`,
+                        backgroundColor: `${accentColor}15`,
+                      }
+                    : undefined
+                }
                 className={`flex items-center justify-between py-1.5 px-2.5 rounded-xl border transition-all duration-200
                   ${
                     added
-                      ? 'bg-[#0d2318] border-[#1ed760]/40'
-                      : 'bg-[#0c1611] border-[#1b3426] hover:border-[#2a553c] hover:bg-[#0f1f16]'
+                      ? ''
+                      : 'bg-[#0e0e13]/85 border-white/10 hover:border-white/30 hover:bg-white/[0.06]'
                   }`}
               >
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <div className="w-8 h-8 rounded-md overflow-hidden bg-[#182b20] shrink-0 border border-[#244231]">
+                  <div className="w-8 h-8 rounded-md overflow-hidden bg-white/[0.06] shrink-0 border border-white/15">
                     {track.albumCoverUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -124,7 +152,7 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#406850]">
+                      <div className="w-full h-full flex items-center justify-center text-white/40">
                         <Music2 className="w-3.5 h-3.5" />
                       </div>
                     )}
@@ -135,14 +163,14 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
                       {track.title}
                     </p>
                     <div className="flex items-center gap-1.5">
-                      <p className="text-[11px] text-[#7e9f8c] truncate leading-tight">
+                      <p className="text-[11px] text-white/60 truncate leading-tight">
                         {track.artistName}
                         {track.albumName ? (
-                          <span className="text-[#5e7d6b]"> • {track.albumName}</span>
+                          <span className="text-white/40"> • {track.albumName}</span>
                         ) : null}
                       </p>
                       {Boolean(track.durationMs && track.durationMs > 0) && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-[#4f6b5b] shrink-0">
+                        <span className="inline-flex items-center gap-0.5 text-[10px] text-white/45 shrink-0">
                           <Clock className="w-2.5 h-2.5" />
                           {formatDuration(track.durationMs!)}
                         </span>
@@ -155,11 +183,19 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
                   type="button"
                   onClick={() => handleAdd(track)}
                   disabled={added}
-                  className={`flex items-center gap-1 py-1 px-2.5 ml-2 rounded-lg text-[11px] font-semibold transition-all shrink-0
+                  style={
+                    added
+                      ? {
+                          color: accentColor,
+                          backgroundColor: `${accentColor}20`,
+                        }
+                      : undefined
+                  }
+                  className={`flex items-center gap-1 py-1 px-2.5 ml-2 rounded-lg text-[11px] font-semibold transition-all shrink-0 cursor-pointer
                     ${
                       added
-                        ? 'bg-[#1b4329] text-[#1ed760] cursor-default'
-                        : 'bg-[#193324] hover:bg-[#1ed760] text-[#c2e2ce] hover:text-[#06140a] active:scale-95'
+                        ? 'cursor-default'
+                        : 'bg-white/10 hover:bg-white text-white hover:text-[#0a0a0c] active:scale-95'
                     }`}
                 >
                   {added ? (
@@ -178,12 +214,12 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
             );
           })
         ) : hasSearched && !isSearching ? (
-          <div className="text-center py-4 text-xs text-[#7e9f8c]">
+          <div className="text-center py-4 text-xs text-white/55">
             ไม่พบเพลงที่ตรงกับ &ldquo;{query}&rdquo;
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center text-xs text-[#4f6b5b] gap-2">
-            <Search className="w-4 h-4 text-[#2a4535]" />
+          <div className="h-full flex items-center justify-center text-xs text-white/40 gap-2">
+            <Search className="w-4 h-4 text-white/30" />
             <span>ค้นหาเพลงจาก Spotify เพื่อแอดเข้าเพลย์ลิสต์</span>
           </div>
         )}
