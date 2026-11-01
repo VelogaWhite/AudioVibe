@@ -14,7 +14,7 @@ from src.models.schemas import AudioFeatures7D
 
 logger = logging.getLogger("llm_extractor")
 
-# Curated benchmark vectors for popular mood presets
+# Curated benchmark vectors for popular mood presets (English + 6 Thai V2 Spec Presets)
 PRESET_VECTORS: Final[dict[str, AudioFeatures7D]] = {
     "chill": AudioFeatures7D(
         danceability=0.55,
@@ -88,32 +88,86 @@ PRESET_VECTORS: Final[dict[str, AudioFeatures7D]] = {
         liveness=0.08,
         speechiness=0.03,
     ),
+    # 6 Thai V2 Quick Mood Presets
+    "เหงาๆ": AudioFeatures7D(
+        danceability=0.36,
+        valence=0.16,
+        energy=0.24,
+        acousticness=0.82,
+        instrumentalness=0.15,
+        liveness=0.10,
+        speechiness=0.04,
+    ),
+    "มันสุดเหวี่ยง": AudioFeatures7D(
+        danceability=0.86,
+        valence=0.82,
+        energy=0.92,
+        acousticness=0.05,
+        instrumentalness=0.02,
+        liveness=0.24,
+        speechiness=0.08,
+    ),
+    "คลั่งรัก": AudioFeatures7D(
+        danceability=0.72,
+        valence=0.86,
+        energy=0.65,
+        acousticness=0.35,
+        instrumentalness=0.02,
+        liveness=0.12,
+        speechiness=0.05,
+    ),
+    "ผ่อนคลาย": AudioFeatures7D(
+        danceability=0.52,
+        valence=0.58,
+        energy=0.30,
+        acousticness=0.78,
+        instrumentalness=0.35,
+        liveness=0.10,
+        speechiness=0.04,
+    ),
+    "สมาธิขั้นสุด": AudioFeatures7D(
+        danceability=0.38,
+        valence=0.45,
+        energy=0.28,
+        acousticness=0.75,
+        instrumentalness=0.88,
+        liveness=0.09,
+        speechiness=0.03,
+    ),
+    "อยากกลับบ้าน": AudioFeatures7D(
+        danceability=0.48,
+        valence=0.52,
+        energy=0.36,
+        acousticness=0.76,
+        instrumentalness=0.12,
+        liveness=0.11,
+        speechiness=0.04,
+    ),
 }
 
-SYSTEM_PROMPT: Final[str] = """You are an expert audio engineering AI for AudioVibe music recommendation engine.
-Convert the given user musical description or mood into a strict 7-dimensional audio feature vector.
+SYSTEM_PROMPT: Final[str] = """You are an expert audio engineering AI for the AudioVibe music recommendation engine.
+Convert the user's musical description, mood, activity, or Thai/English prompt into a strict 7-dimensional audio feature vector.
 
 You MUST respond ONLY with a raw JSON object containing these 7 float keys, each strictly bounded between 0.0 and 1.0:
-- "danceability": Suitability for dancing (0.0=lowest, 1.0=highest)
-- "valence": Musical positiveness / cheerfulness (0.0=sad/dark, 1.0=euphoric/happy)
-- "energy": Perceptual intensity and activity (0.0=calm/ambient, 1.0=loud/fast/hyper)
-- "acousticness": Confidence whether the track is acoustic (0.0=fully electronic, 1.0=pure acoustic)
-- "instrumentalness": Likelihood of no vocals (0.0=heavy vocals, 1.0=purely instrumental)
-- "liveness": Presence of audience / live setting (0.0=studio produced, 1.0=live performance)
-- "speechiness": Presence of spoken words (0.0=pure music, 1.0=talk show/podcast, music is typically < 0.3)
+- "danceability": Suitability for dancing and rhythm groove (0.0=free tempo/ballad, 0.5=mid-tempo groove, 0.85+=club/dance/party)
+- "valence": Musical positiveness and emotional brightness (0.0-0.25=heartbroken/sad/lonely/dark/เศร้า/เหงา/อกหัก, 0.45-0.65=chill/warm/nostalgic/ผ่อนคลาย/ขับรถชิลๆ, 0.75-0.95=happy/romantic/in-love/fun/คลั่งรัก/สนุกสนาน)
+- "energy": Perceptual intensity and loudness (0.05-0.30=sleep/rainy/sad/acoustic/ช้า/ซึ้ง/ฝนตก, 0.35-0.55=chill/cafe/lofi/สบายๆ, 0.80-0.98=rock/EDM/workout/มันส์/ตื๊ด/เบสหนัก)
+- "acousticness": Acoustic vs electronic production (0.0-0.15=EDM/synth/rock/hip-hop, 0.65-0.95=acoustic guitar/piano/folk/ballad/เพลงช้า/อะคูสติก)
+- "instrumentalness": Likelihood of no vocals (0.0-0.05=songs with singing/vocals, 0.75-0.95=instrumental/study/focus/coding/บรรเลง/อ่านหนังสือ/สมาธิ)
+- "liveness": Presence of live audience (0.08-0.15=studio recording, 0.60+=concert/live session)
+- "speechiness": Presence of spoken/rap words (0.03-0.06=melodic singing, 0.15-0.35=rap/hip-hop)
 
 CRITICAL RULES:
-1. Return ONLY the JSON object.
-2. NO markdown code blocks (NO ``` or ```json).
-3. NO conversational intro or outro text.
-4. All values MUST be valid numbers in range [0.0, 1.0].
+1. Make the vector values DISTINCT and EXPRESSIVE to match the exact mood (avoid generic 0.5 values).
+2. Unless the user asks for instrumental/study/focus/lofi/classical music, keep "instrumentalness" low (0.0 - 0.10) so vocal songs are selected.
+3. Return ONLY the raw JSON object. NO markdown code blocks (NO ```), NO explanation.
 
 Example output:
 {"danceability": 0.72, "valence": 0.65, "energy": 0.81, "acousticness": 0.12, "instrumentalness": 0.02, "liveness": 0.14, "speechiness": 0.05}"""
 
 REFINE_SYSTEM_PROMPT: Final[str] = """You are an expert audio engineering AI for AudioVibe music recommendation engine.
-You are given a current 7-dimensional audio feature vector and a user refinement instruction.
-Adjust the 7-dimensional vector according to the instruction.
+You are given a current 7-dimensional audio feature vector and a user refinement instruction (in Thai or English).
+Adjust the 7-dimensional vector decisively according to the instruction.
 
 Return ONLY a raw JSON object with the adjusted 7 float values in range [0.0, 1.0]:
 - "danceability"
@@ -173,13 +227,15 @@ class LLMExtractor:
     def _get_preset_vector(self, preset_name: str) -> AudioFeatures7D | None:
         """Find matching preset in predefined dictionary."""
         normalized = preset_name.strip().lower()
+        if not normalized:
+            return None
         for key, vector in PRESET_VECTORS.items():
             if key in normalized or normalized in key:
                 return vector
         return None
 
     def _heuristic_extract(self, text: str) -> AudioFeatures7D:
-        """Deterministic keyword-based heuristic fallback when LLM is unavailable."""
+        """Deterministic keyword-based heuristic fallback (supports Thai & English)."""
         lower = text.lower()
         preset = self._get_preset_vector(lower)
         if preset:
@@ -188,31 +244,90 @@ class LLMExtractor:
         # Default neutral baseline
         danceability = 0.60
         valence = 0.55
-        energy = 0.60
+        energy = 0.55
         acousticness = 0.30
-        instrumentalness = 0.10
-        liveness = 0.15
+        instrumentalness = 0.05
+        liveness = 0.12
         speechiness = 0.05
 
-        if any(w in lower for w in ["calm", "relax", "chill", "slow", "ambient", "soft"]):
-            energy -= 0.30
+        if any(
+            w in lower
+            for w in [
+                "calm", "relax", "chill", "slow", "ambient", "soft",
+                "ชิล", "สบาย", "ผ่อนคลาย", "เบาๆ", "คาเฟ่", "เรื่อยๆ", "ลมเย็น", "กลางคืน",
+            ]
+        ):
+            energy -= 0.25
+            acousticness += 0.38
+            danceability -= 0.10
+
+        if any(
+            w in lower
+            for w in [
+                "energetic", "hyper", "fast", "rock", "metal", "bass", "hard", "workout",
+                "มัน", "ตื๊ด", "เร็ว", "ร็อค", "เบสหนัก", "ออกกำลังกาย", "วิ่ง", "สุดเหวี่ยง", "เดือด",
+            ]
+        ):
+            energy += 0.35
+            acousticness -= 0.22
+            danceability += 0.18
+
+        if any(
+            w in lower
+            for w in [
+                "happy", "cheerful", "sunny", "joy", "fun", "love", "romantic",
+                "สนุก", "สดใส", "อารมณ์ดี", "รัก", "คลั่งรัก", "โรแมนติก", "หวาน", "ฟีลกู๊ด", "มีความสุข",
+            ]
+        ):
+            valence += 0.32
+            danceability += 0.12
+
+        if any(
+            w in lower
+            for w in [
+                "sad", "depressed", "melancholy", "cry", "lonely", "heartbreak", "rain",
+                "เศร้า", "เหงา", "อกหัก", "ร้องไห้", "ฝนตก", "ซึ้ง", "หน่วง", "คิดถึง", "เจ็บ", "คนเดียว",
+            ]
+        ):
+            valence -= 0.38
+            energy -= 0.28
+            acousticness += 0.42
+            danceability -= 0.20
+
+        if any(
+            w in lower
+            for w in [
+                "instrumental", "study", "coding", "focus", "piano", "lofi", "read",
+                "บรรเลง", "อ่านหนังสือ", "สมาธิ", "โฟกัส", "ทำงาน", "เปียโน", "ไม่มีเนื้อร้อง",
+            ]
+        ):
+            instrumentalness += 0.78
+            energy -= 0.18
             acousticness += 0.35
-            danceability -= 0.15
-        if any(w in lower for w in ["energetic", "hyper", "fast", "rock", "metal", "bass", "hard"]):
-            energy += 0.30
-            acousticness -= 0.20
-            danceability += 0.15
-        if any(w in lower for w in ["happy", "cheerful", "sunny", "joy", "fun"]):
-            valence += 0.30
-        if any(w in lower for w in ["sad", "depressed", "melancholy", "cry", "lonely"]):
-            valence -= 0.35
-            energy -= 0.20
-        if any(w in lower for w in ["instrumental", "study", "coding", "focus", "piano", "lofi"]):
-            instrumentalness += 0.65
             speechiness -= 0.02
-        if any(w in lower for w in ["party", "dance", "club", "edm", "disco"]):
-            danceability += 0.25
-            energy += 0.20
+
+        if any(
+            w in lower
+            for w in [
+                "party", "dance", "club", "edm", "disco",
+                "ปาร์ตี้", "เต้น", "ผับ", "แดนซ์",
+            ]
+        ):
+            danceability += 0.26
+            energy += 0.25
+            valence += 0.20
+            acousticness -= 0.20
+
+        if any(w in lower for w in ["rap", "hip-hop", "hiphop", "แร็พ", "ฮิปฮอป"]):
+            speechiness += 0.18
+            danceability += 0.18
+            acousticness -= 0.15
+
+        if any(w in lower for w in ["กลับบ้าน", "บ้าน", "อบอุ่น", "nostalgia", "home", "warm"]):
+            valence = 0.55
+            energy = 0.36
+            acousticness = 0.75
+            danceability = 0.48
 
         def clamp(val: float) -> float:
             return round(max(0.0, min(1.0, val)), 3)
@@ -231,11 +346,18 @@ class LLMExtractor:
         self, prompt: str | None = None, preset_name: str | None = None
     ) -> AudioFeatures7D:
         """Extract a 7-dimensional target vector using OpenRouter GLM 5.3 Flash."""
-        # 1. Check if direct preset match
+        # 1. Check if direct preset match when only preset_name is given
         if preset_name and not prompt:
             preset_vec = self._get_preset_vector(preset_name)
             if preset_vec is not None:
                 return preset_vec
+
+        # If preset_name matches a known curated preset and prompt is just the preset's default prompt
+        if preset_name:
+            preset_vec = self._get_preset_vector(preset_name)
+            if preset_vec is not None and (not prompt or len(prompt.strip()) <= 60):
+                # Still allow LLM if API key is present, or use preset as strong prior
+                pass
 
         user_content = (
             f"User Prompt: {prompt}"
@@ -263,7 +385,7 @@ class LLMExtractor:
                 {"role": "user", "content": user_content},
             ],
             "temperature": 0.2,
-            "max_tokens": 128,
+            "max_tokens": 512,
         }
 
         client_to_use = self.http_client or httpx.AsyncClient(
@@ -338,7 +460,7 @@ class LLMExtractor:
                 {"role": "user", "content": user_content},
             ],
             "temperature": 0.2,
-            "max_tokens": 128,
+            "max_tokens": 512,
         }
 
         client_to_use = self.http_client or httpx.AsyncClient(

@@ -13,6 +13,7 @@ import { SpotifyAdapter } from '../music-provider/spotify.adapter.js';
 import { TrackService } from '../track/track.service.js';
 
 const SEARCH_CACHE_TTL_SECONDS = 24 * 60 * 60;
+const TRACK_META_CACHE_TTL_SECONDS = 7 * 24 * 60 * 60;
 
 @Injectable()
 export class PlaylistService {
@@ -76,10 +77,120 @@ export class PlaylistService {
     return { deleted: true, playlistId };
   }
 
+  private async enrichMissingTrackMetadata(userId: string, tracks: TrackDTO[]) {
+    const missingTracks = tracks.filter((t) => !t.albumCoverUrl);
+    if (missingTracks.length === 0 || typeof this.musicProviderAdapter.getTracksMetadata !== 'function') {
+      return;
+    }
+
+    const redis = this.redisService.getClient();
+    const uncachedIds: string[] = [];
+    const metaById = new Map<string, { albumName: string | null; albumCoverUrl: string | null; durationMs: number; popularity: number }>();
+
+    for (const t of missingTracks) {
+      try {
+        const cached = await redis.get(`track:meta:${t.id}`);
+        if (cached) {
+          metaById.set(t.id, JSON.parse(cached));
+        } else {
+          uncachedIds.push(t.id);
+        }
+      } catch {
+        uncachedIds.push(t.id);
+      }
+    }
+
+    if (uncachedIds.length > 0) {
+      try {
+        const fetched = await this.musicProviderAdapter.getTracksMetadata(userId, uncachedIds);
+        for (const item of fetched) {
+          const meta = {
+            albumName: item.albumName,
+            albumCoverUrl: item.albumCoverUrl,
+            durationMs: item.durationMs,
+            popularity: item.popularity,
+          };
+          metaById.set(item.id, meta);
+          await redis.set(`track:meta:${item.id}`, JSON.stringify(meta), 'EX', TRACK_META_CACHE_TTL_SECONDS).catch(() => undefined);
+        }
+      } catch {
+        // Fallback when GET /v1/tracks?ids=... returns 403 in Spotify Development Mode:
+        // Fetch official album cover via Spotify oEmbed API in parallel and cache for 7 days
+        await Promise.all(
+          uncachedIds.map(async (trackId) => {
+            try {
+              const res = await fetch(
+                `https://open.spotify.com/oembed?url=https://open.spotify.com/track/${encodeURIComponent(trackId)}`,
+              );
+              if (!res.ok) return;
+              const data = (await res.json()) as { thumbnail_url?: string };
+              if (data.thumbnail_url) {
+                const meta = {
+                  albumName: null,
+                  albumCoverUrl: data.thumbnail_url,
+                  durationMs: 0,
+                  popularity: 0,
+                };
+                metaById.set(trackId, meta);
+                await redis
+                  .set(`track:meta:${trackId}`, JSON.stringify(meta), 'EX', TRACK_META_CACHE_TTL_SECONDS)
+                  .catch(() => undefined);
+              }
+            } catch {
+              // Ignore individual track oEmbed errors
+            }
+          }),
+        );
+      }
+    }
+
+    for (const t of missingTracks) {
+      const meta = metaById.get(t.id);
+      if (meta) {
+        t.albumName = t.albumName || meta.albumName;
+        t.albumCoverUrl = t.albumCoverUrl || meta.albumCoverUrl;
+        if (!t.durationMs && meta.durationMs) t.durationMs = meta.durationMs;
+        if (!t.popularity && meta.popularity) t.popularity = meta.popularity;
+      }
+    }
+  }
+
   async addTracks(userId: string, playlistId: string, request: AddPlaylistTracksRequestDTO) {
     await this.findOwnedPlaylist(userId, playlistId);
     const tracks = request.tracks ?? [];
-    for (const track of tracks) await this.trackService.upsert(track);
+
+    // V2 Spec: Batch Metadata Enrichment (GET /v1/tracks?ids=...) for AI-recommended tracks missing cover URLs
+    await this.enrichMissingTrackMetadata(userId, tracks);
+
+    for (const track of tracks) {
+      await this.trackService.upsert(track);
+      if (track.audioFeatures && (this.prisma as any).audioFeature?.upsert) {
+        const af = track.audioFeatures;
+        await (this.prisma as any).audioFeature.upsert({
+          where: { trackId: track.id },
+          create: {
+            trackId: track.id,
+            danceability: Number(af.danceability ?? 0.5),
+            valence: Number(af.valence ?? 0.5),
+            energy: Number(af.energy ?? 0.5),
+            acousticness: Number(af.acousticness ?? 0.5),
+            instrumentalness: Number(af.instrumentalness ?? 0),
+            liveness: Number(af.liveness ?? 0.1),
+            speechiness: Number(af.speechiness ?? 0.05),
+          },
+          update: {
+            danceability: Number(af.danceability ?? 0.5),
+            valence: Number(af.valence ?? 0.5),
+            energy: Number(af.energy ?? 0.5),
+            acousticness: Number(af.acousticness ?? 0.5),
+            instrumentalness: Number(af.instrumentalness ?? 0),
+            liveness: Number(af.liveness ?? 0.1),
+            speechiness: Number(af.speechiness ?? 0.05),
+          },
+        }).catch(() => undefined);
+      }
+    }
+
     const ids = request.trackIds ?? tracks.map((track) => track.id);
     const existing = await this.prisma.playlistTrack.findMany({ where: { playlistId }, orderBy: { order: 'desc' }, take: 1 });
     let nextOrder = (existing[0]?.order ?? -1) + 1;
@@ -90,9 +201,12 @@ export class PlaylistService {
         update: {},
       });
     }
+
+    // Keep AI_ANALYTICS when a batch of AI tracks with audioFeatures (>1 track) is persisted; otherwise switch to MANUAL_MANAGER
+    const isAiBatch = tracks.length > 1 && tracks.every((t) => t.audioFeatures !== null && t.audioFeatures !== undefined);
     await this.prisma.playlist.update({
       where: { id: playlistId },
-      data: { displayMode: 'MANUAL_MANAGER' },
+      data: { displayMode: isAiBatch ? 'AI_ANALYTICS' : 'MANUAL_MANAGER' },
     });
     return this.get(userId, playlistId);
   }

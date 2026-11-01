@@ -78,7 +78,7 @@ async function main() {
             id: trackId,
             title: rowData['track_name'] || 'Unknown Title',
             artistName: rowData['artist_name'] || 'Unknown Artist',
-            albumName: null,
+            albumName: rowData['album_name'] || null,
             albumCoverUrl: null,
             durationMs: parseInt(rowData['duration_ms'] || '0', 10),
             popularity: parseInt(rowData['popularity'] || '0', 10),

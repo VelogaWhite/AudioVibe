@@ -62,7 +62,7 @@ export class SpotifyAuthController {
       tokenData.expires_in,
     );
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     return response.redirect(`${frontendUrl}/studio?userId=${user.id}`);
   }
 

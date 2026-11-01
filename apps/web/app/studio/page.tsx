@@ -244,9 +244,18 @@ export default function UnifiedPlaylistStudioPage() {
         aiPlaylist.id,
         result.tracks,
       );
+      const scoreMap = new Map(result.tracks.map((t) => [t.id, t]));
+      const enrichedPlaylist = {
+        ...persistedPlaylist,
+        tracks: persistedPlaylist.tracks.map((t) => ({
+          ...t,
+          matchScore: scoreMap.get(t.id)?.matchScore ?? t.matchScore,
+          audioFeatures: t.audioFeatures ?? scoreMap.get(t.id)?.audioFeatures,
+        })),
+      };
 
-      setPlaylists([persistedPlaylist, ...playlists]);
-      setPlaylist(persistedPlaylist);
+      setPlaylists([enrichedPlaylist, ...playlists]);
+      setPlaylist(enrichedPlaylist);
 
       // SPEC: Switch to AI_ANALYTICS mode so Radar Chart is displayed!
       setMode('AI_ANALYTICS');
