@@ -90,11 +90,16 @@ export async function searchSpotifyTracks(userId: string, query: string, limit =
   );
 }
 
-export async function addTracksToPlaylist(userId: string, playlistId: string, tracks: Track[]) {
+export async function addTracksToPlaylist(
+  userId: string,
+  playlistId: string,
+  tracks: Track[],
+  replace = false,
+) {
   const data = await requestJson<BackendPlaylist>(`${getCoreApiBaseUrl()}/playlists/${playlistId}/tracks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, tracks }),
+    body: JSON.stringify({ userId, tracks, ...(replace ? { replace: true } : {}) }),
   });
   return toPlaylist(data);
 }
@@ -133,13 +138,19 @@ export async function exportPlaylistToSpotify(
 export async function generateAIRecommendations(
   prompt: string,
   presetName?: string,
+  excludeIds?: string[],
 ): Promise<{ tracks: Track[]; targetFeatures: AudioFeatures }> {
   const response = await requestJson<{ target_vector: AudioFeatures; tracks: MlTrack[] }>(
     `${getMlApiBaseUrl()}/api/v1/recommend`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt || undefined, preset_name: presetName || undefined, limit: 15 }),
+      body: JSON.stringify({
+        prompt: prompt || undefined,
+        preset_name: presetName || undefined,
+        limit: 15,
+        exclude_ids: excludeIds && excludeIds.length > 0 ? excludeIds : undefined,
+      }),
     },
   );
 

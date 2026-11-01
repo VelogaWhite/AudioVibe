@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TrackDTO } from './track.dto.js';
 
@@ -17,4 +17,8 @@ export class AddPlaylistTracksRequestDTO {
   @IsArray()
   @IsString({ each: true })
   trackIds?: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  replace?: boolean;
 }

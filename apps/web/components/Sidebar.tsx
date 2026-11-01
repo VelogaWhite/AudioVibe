@@ -1,190 +1,259 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Plus,
-  RefreshCw,
   Edit2,
   Trash2,
   Share2,
-  User as UserIcon,
   ListMusic,
-  Check,
+  MoreVertical,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Music,
+  RefreshCw,
 } from 'lucide-react';
-import { usePlaylistStore } from '../store/usePlaylistStore';
-
-interface UserProfile {
-  id: string;
-  displayName: string;
-  spotifyId: string;
-  profileImageUrl?: string;
-}
+import { usePlaylistStore, Playlist } from '../store/usePlaylistStore';
 
 interface SidebarProps {
-  user: UserProfile | null;
-  onCreatePlaylist: () => void;
-  onRefreshPlaylists: () => void;
-  onRenamePlaylist: () => void;
-  onDeletePlaylist: () => void;
-  onExportPlaylist: () => void;
+  isOpen: boolean;
+  onToggle: () => void;
+  isNewPlaylistView: boolean;
+  onNewPlaylistClick: () => void;
   onSelectPlaylist: (id: string) => void;
+  onRenamePlaylist: (playlist?: Playlist) => void;
+  onDeletePlaylist: (playlist?: Playlist) => void;
+  onExportPlaylist: (playlist?: Playlist) => void;
+  onRefreshPlaylists: () => void;
   isExporting?: boolean;
 }
 
 export function Sidebar({
-  user,
-  onCreatePlaylist,
-  onRefreshPlaylists,
+  isOpen,
+  onToggle,
+  isNewPlaylistView,
+  onNewPlaylistClick,
+  onSelectPlaylist,
   onRenamePlaylist,
   onDeletePlaylist,
   onExportPlaylist,
-  onSelectPlaylist,
+  onRefreshPlaylists,
   isExporting = false,
 }: SidebarProps) {
-  const { currentPlaylist, playlists, tracks } = usePlaylistStore();
+  const { currentPlaylist, playlists } = usePlaylistStore();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
-    <aside className="w-full lg:w-[30%] flex flex-col gap-5">
-      {/* User Profile Card */}
-      <section className="bg-[#121f18]/90 border border-[#234230] rounded-2xl p-5 shadow-lg backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="w-13 h-13 rounded-full overflow-hidden bg-[#1b3827] border-2 border-[#1ed760] shrink-0">
-            {user?.profileImageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={user.profileImageUrl}
-                alt={user.displayName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#558367]">
-                <UserIcon className="w-6 h-6" />
+    <aside
+      className={`shrink-0 bg-[#0d1913]/95 border-r border-[#1f3a2b] backdrop-blur-md flex flex-col transition-all duration-300 z-30 h-screen sticky top-0 overflow-hidden ${
+        isOpen ? 'w-72' : 'w-16'
+      }`}
+    >
+      {/* Top Bar: Brand + Collapse/Expand Button */}
+      <div className="flex items-center justify-between p-3.5 border-b border-[#1b3426]">
+        {isOpen ? (
+          <>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1ed760] to-[#0f6832] flex items-center justify-center shadow shadow-[#1ed760]/20 shrink-0">
+                <Music className="w-4 h-4 text-[#05160b]" />
               </div>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-base font-bold text-white truncate">
-              {user?.displayName || 'Loading profile...'}
-            </h3>
-            <p className="text-xs text-[#82a691] truncate font-mono mt-0.5">
-              Spotify: {user?.spotifyId || 'unknown'}
-            </p>
-          </div>
-        </div>
-
-        {/* Active Playlist Selector */}
-        <div className="mt-5">
-          <label
-            htmlFor="playlist-select"
-            className="block text-xs font-semibold text-[#82a691] uppercase tracking-wider mb-2"
-          >
-            Active Playlist (เพลย์ลิสต์ที่ใช้งาน)
-          </label>
-          <div className="relative">
-            <select
-              id="playlist-select"
-              value={currentPlaylist?.id || ''}
-              onChange={(e) => onSelectPlaylist(e.target.value)}
-              className="w-full bg-[#0b1410] border border-[#2c4d3a] rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#1ed760] transition-colors appearance-none"
+              <span className="text-base font-extrabold text-white tracking-tight truncate">
+                Audio<span className="text-[#1ed760]">Vibe</span>
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={onToggle}
+              title="ย่อแถบเมนู"
+              className="p-2 rounded-xl text-[#82a691] hover:text-white hover:bg-[#182e22] transition-colors"
             >
-              <option value="">-- เลือกเพลย์ลิสต์ --</option>
-              {playlists.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.tracks?.length || 0} tracks)
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Playlist Controls */}
-        <div className="grid grid-cols-2 gap-2 mt-3">
+              <PanelLeftClose className="w-5 h-5" />
+            </button>
+          </>
+        ) : (
           <button
-            onClick={onCreatePlaylist}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#1ed760] hover:bg-[#1db954] text-[#06140a] text-xs font-bold transition-all shadow"
+            type="button"
+            onClick={onToggle}
+            title="ขยายแถบเมนู"
+            className="w-full flex items-center justify-center p-2 rounded-xl text-[#82a691] hover:text-white hover:bg-[#182e22] transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            <span>New Playlist</span>
+            <PanelLeftOpen className="w-5 h-5" />
           </button>
-          <button
-            onClick={onRefreshPlaylists}
-            className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#1d3326] hover:bg-[#254232] text-[#c2e2ce] text-xs font-medium transition-all"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Refresh</span>
-          </button>
-        </div>
-      </section>
+        )}
+      </div>
 
-      {/* Current Playlist Summary & Actions */}
-      <section className="bg-[#121f18]/90 border border-[#234230] rounded-2xl p-5 shadow-lg backdrop-blur flex flex-col gap-4">
-        <div className="flex items-center gap-2 pb-2 border-b border-[#1f3a2b]">
-          <ListMusic className="w-5 h-5 text-[#1ed760]" />
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-            Current Playlist Summary
-          </h3>
-        </div>
-
-        <div>
-          <div className="text-lg font-bold text-white truncate">
-            {currentPlaylist?.name || 'ยังไม่ได้เลือกเพลย์ลิสต์'}
-          </div>
-          <div className="text-xs text-[#82a691] mt-1 flex items-center gap-2">
-            <span>{tracks.length} เพลง</span>
-            <span>•</span>
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                currentPlaylist?.isExported
-                  ? 'bg-[#1b432c] text-[#1ed760]'
-                  : 'bg-[#2a291e] text-[#e0b84c]'
-              }`}
-            >
-              {currentPlaylist?.isExported ? '✓ Exported to Spotify' : 'Local Only'}
-            </span>
-          </div>
-        </div>
-
-        {/* Manage Buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={onRenamePlaylist}
-            disabled={!currentPlaylist}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#1a2d21] hover:bg-[#223d2c] border border-[#2a4d38] text-xs text-[#c2e2ce] font-medium transition-all disabled:opacity-40"
-          >
-            <Edit2 className="w-3.5 h-3.5" />
-            <span>Rename</span>
-          </button>
-          <button
-            onClick={onDeletePlaylist}
-            disabled={!currentPlaylist}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-[#2b1717] hover:bg-[#3d1f1f] border border-[#522929] text-xs text-[#ff9999] font-medium transition-all disabled:opacity-40"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Delete</span>
-          </button>
-        </div>
-
-        {/* Large Call to Action: Export to Spotify */}
+      {/* New Playlist Button (Gemini "แชทใหม่" style) */}
+      <div className="p-3">
         <button
-          onClick={onExportPlaylist}
-          disabled={!currentPlaylist || tracks.length === 0 || isExporting}
-          className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm bg-[#1ed760] hover:bg-[#1db954] text-[#06140a] transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-lg hover:shadow-[#1ed760]/25 mt-2"
+          type="button"
+          onClick={() => {
+            setOpenMenuId(null);
+            onNewPlaylistClick();
+          }}
+          title="New Playlist"
+          className={`w-full flex items-center ${
+            isOpen ? 'justify-start gap-3 px-4 py-3' : 'justify-center p-3'
+          } rounded-2xl font-bold text-sm transition-all ${
+            isNewPlaylistView
+              ? 'bg-[#1ed760] text-[#051409] shadow-lg shadow-[#1ed760]/20'
+              : 'bg-[#162b20] hover:bg-[#1e3a2b] text-[#d5f2df] border border-[#274b37]'
+          }`}
         >
-          {isExporting ? (
-            <RefreshCw className="w-4 h-4 animate-spin" />
-          ) : currentPlaylist?.isExported ? (
-            <>
-              <Check className="w-4 h-4" />
-              <span>Sync with Spotify</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-4 h-4" />
-              <span>Export to Spotify</span>
-            </>
-          )}
+          <Plus className="w-4 h-4 shrink-0" />
+          {isOpen && <span className="truncate">New Playlist</span>}
         </button>
-      </section>
+      </div>
+
+      {/* Playlist History List (Gemini chat history style) */}
+      <div className="flex-1 flex flex-col min-h-0 px-2 pb-4">
+        {isOpen && (
+          <div className="flex items-center justify-between px-2 py-2 text-[11px] font-semibold text-[#799c87] uppercase tracking-wider">
+            <span>เพลย์ลิสต์ทั้งหมด ({playlists.length})</span>
+            <button
+              type="button"
+              onClick={onRefreshPlaylists}
+              title="รีเฟรชรายการเพลย์ลิสต์"
+              className="p-1 rounded-lg hover:bg-[#182e22] hover:text-white transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        <div
+          ref={menuRef}
+          className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar"
+        >
+          {playlists.length === 0 ? (
+            isOpen && (
+              <div className="px-3 py-6 text-center text-xs text-[#5e7d6b]">
+                ยังไม่มีประวัติเพลย์ลิสต์
+              </div>
+            )
+          ) : (
+            playlists.map((playlist) => {
+              const isSelected =
+                !isNewPlaylistView && currentPlaylist?.id === playlist.id;
+              const isMenuOpen = openMenuId === playlist.id;
+
+              return (
+                <div key={playlist.id} className="relative group">
+                  <div
+                    className={`flex items-center ${
+                      isOpen ? 'justify-between px-3 py-2.5' : 'justify-center p-2.5'
+                    } rounded-xl cursor-pointer transition-all ${
+                      isSelected
+                        ? 'bg-[#1b3628] text-white border border-[#2d5940]'
+                        : 'text-[#b5d4c1] hover:bg-[#14271d] hover:text-white border border-transparent'
+                    }`}
+                    onClick={() => {
+                      setOpenMenuId(null);
+                      onSelectPlaylist(playlist.id);
+                    }}
+                    title={playlist.name}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <ListMusic
+                        className={`w-4 h-4 shrink-0 ${
+                          isSelected ? 'text-[#1ed760]' : 'text-[#6c8f79]'
+                        }`}
+                      />
+                      {isOpen && (
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold truncate">
+                            {playlist.name}
+                          </p>
+                          <p className="text-[10px] text-[#6c8f79] truncate">
+                            {playlist.tracks?.length || 0} เพลง
+                            {playlist.isExported ? ' • Exported' : ''}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Three-dot action button */}
+                    {isOpen && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(isMenuOpen ? null : playlist.id);
+                        }}
+                        aria-label={`ตัวเลือกสำหรับ ${playlist.name}`}
+                        className={`p-1.5 rounded-lg transition-colors shrink-0 ${
+                          isMenuOpen
+                            ? 'bg-[#244734] text-white opacity-100'
+                            : 'text-[#7ea08d] hover:bg-[#21402f] hover:text-white opacity-80 group-hover:opacity-100'
+                        }`}
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Gemini-style Popup Menu for Rename, Delete, Export */}
+                  {isOpen && isMenuOpen && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-2 top-11 z-50 w-44 rounded-2xl bg-[#15281e] border border-[#2c523c] shadow-2xl py-1.5 text-xs text-[#d8f3e2] animate-in fade-in zoom-in-95 duration-150"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          onRenamePlaylist(playlist);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-[#1f3b2c] transition-colors text-left"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 text-[#8eb09c]" />
+                        <span>Rename (เปลี่ยนชื่อ)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isExporting || (playlist.tracks?.length || 0) === 0}
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          onExportPlaylist(playlist);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-[#1f3b2c] transition-colors text-left disabled:opacity-40"
+                      >
+                        <Share2 className="w-3.5 h-3.5 text-[#1ed760]" />
+                        <span>Export (ส่งออก)</span>
+                      </button>
+
+                      <div className="my-1 border-t border-[#234230]" />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          onDeletePlaylist(playlist);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 hover:bg-[#331a1a] text-[#ff9999] transition-colors text-left"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete (ลบ)</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
     </aside>
   );
 }

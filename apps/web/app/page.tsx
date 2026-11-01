@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { Music, Sparkles, Disc, Radio, ArrowRight } from 'lucide-react';
+import { Music, Sparkles, Disc, Radio } from 'lucide-react';
 import { BackgroundVibe } from '../components/BackgroundVibe';
 
 export default function LandingPage() {
@@ -43,24 +42,15 @@ export default function LandingPage() {
           พร้อมการวิเคราะห์ 7 มิติเสียงเชิงลึก (Radar Chart) และเชื่อมต่อไปยัง Spotify ได้จริง
         </p>
 
-        {/* Call To Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+        {/* Call To Action Button */}
+        <div className="flex w-full justify-center">
           <a
             href={spotifyLoginUrl}
-            className="flex items-center justify-center gap-3 py-4 px-8 rounded-2xl font-extrabold text-base bg-[#1ed760] hover:bg-[#1db954] text-[#051409] shadow-xl shadow-[#1ed760]/25 transition-all hover:scale-105 active:scale-95"
+            className="w-full flex items-center justify-center gap-3 py-4 px-10 rounded-2xl font-extrabold text-base bg-[#1ed760] hover:bg-[#1db954] text-[#051409] shadow-xl shadow-[#1ed760]/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Disc className="w-5 h-5 animate-spin" style={{ animationDuration: '4s' }} />
             <span>Connect to your Spotify account</span>
           </a>
-
-          {/* Quick Studio Demo Access */}
-          <Link
-            href="/studio"
-            className="flex items-center justify-center gap-2 py-4 px-6 rounded-2xl font-bold text-sm bg-[#13281c] hover:bg-[#1a3827] border border-[#275038] text-[#cbead6] transition-all hover:scale-105"
-          >
-            <span>เข้าสู่ Studio ตรง</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
 
         {/* Feature Badges */}

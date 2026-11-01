@@ -192,7 +192,12 @@ export class PlaylistService {
     }
 
     const ids = request.trackIds ?? tracks.map((track) => track.id);
-    const existing = await this.prisma.playlistTrack.findMany({ where: { playlistId }, orderBy: { order: 'desc' }, take: 1 });
+    if (request.replace && (this.prisma.playlistTrack as any).deleteMany) {
+      await (this.prisma.playlistTrack as any).deleteMany({ where: { playlistId } });
+    }
+    const existing = request.replace
+      ? []
+      : await this.prisma.playlistTrack.findMany({ where: { playlistId }, orderBy: { order: 'desc' }, take: 1 });
     let nextOrder = (existing[0]?.order ?? -1) + 1;
     for (const trackId of ids) {
       await this.prisma.playlistTrack.upsert({
