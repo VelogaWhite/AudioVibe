@@ -118,3 +118,45 @@ class TestVectorStore:
         # Should not crash and similarity scores should be finite floats
         for track in results:
             assert isinstance(track.similarity_score, float)
+
+    def test_three_round_sliding_window_cooldown(self) -> None:
+        """Verify 3-round cooldown prevents repeating tracks for 3 rounds and unlocks Round 1 on Round 4."""
+        rows = [
+            {
+                "track_id": f"t_{i}",
+                "track_name": f"Song {i}",
+                "artist_name": f"Artist {i}",
+                "album_name": f"Album {i}",
+                "genre": "Pop",
+                "popularity": 80,
+                "danceability": 0.80,
+                "valence": 0.75,
+                "energy": 0.80,
+                "acousticness": 0.15,
+                "instrumentalness": 0.01,
+                "liveness": 0.15,
+                "speechiness": 0.05,
+            }
+            for i in range(150)
+        ]
+        vs = VectorStore(history_rounds=3)
+        vs.load_from_dataframe(pd.DataFrame(rows))
+        query = [0.80, 0.75, 0.80, 0.15, 0.01, 0.15, 0.05]
+
+        r1_ids = {t.track_id for t in vs.search(query, limit=15)}
+        r2_ids = {t.track_id for t in vs.search(query, limit=15)}
+        r3_ids = {t.track_id for t in vs.search(query, limit=15)}
+
+        # Rounds 1, 2, and 3 must be completely disjoint
+        assert len(r1_ids & r2_ids) == 0
+        assert len(r1_ids & r3_ids) == 0
+        assert len(r2_ids & r3_ids) == 0
+        assert len(vs._recent_rounds) == 3
+
+        # Round 4 excludes R1, R2, R3 and then evicts R1 from the 3-round deque
+        r4_ids = {t.track_id for t in vs.search(query, limit=15)}
+        assert len(r4_ids & r1_ids) == 0
+        assert len(r4_ids & r2_ids) == 0
+        assert len(r4_ids & r3_ids) == 0
+        assert len(vs._recent_rounds) == 3
+        assert r1_ids not in vs._recent_rounds

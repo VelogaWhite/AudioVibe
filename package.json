@@ -1,0 +1,16 @@
+{
+  "name": "audiovibe-monorepo",
+  "version": "2.0.0",
+  "private": true,
+  "description": "AudioVibe: Intelligent Music Playlist Generator & Deep Audio Feature Recommendation System",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.0.0"
+  }
+}

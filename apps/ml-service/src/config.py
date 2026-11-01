@@ -33,7 +33,10 @@ class Settings:
 
     # OpenRouter LLM config
     OPENROUTER_API_KEY: Final[str] = os.getenv("OPENROUTER_API_KEY", "")
-    OPENROUTER_MODEL: Final[str] = os.getenv("OPENROUTER_MODEL", "thudm/glm-5.3-flash")
+    OPENROUTER_MODEL: Final[str] = os.getenv(
+        "OPENROUTER_MODEL",
+        os.getenv("LLM_MODEL_NAME", "z-ai/glm-5.3-flash"),
+    )
     OPENROUTER_API_URL: Final[str] = os.getenv(
         "OPENROUTER_API_URL", "https://openrouter.ai/api/v1/chat/completions"
     )

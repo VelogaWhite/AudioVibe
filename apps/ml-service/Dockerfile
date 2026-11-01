@@ -20,6 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY data/ ./data/
 COPY src/ ./src/
 COPY scripts/ ./scripts/
+# Keep tests in the image so the same artifact can be verified in CI/debug runs.
+COPY tests/ ./tests/
 
 # Expose FastAPI service port
 EXPOSE 8000

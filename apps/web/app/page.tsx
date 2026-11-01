@@ -6,7 +6,9 @@ import { Music, Sparkles, Disc, Radio, ArrowRight } from 'lucide-react';
 import { BackgroundVibe } from '../components/BackgroundVibe';
 
 export default function LandingPage() {
-  const spotifyLoginUrl = 'http://127.0.0.1:3000/auth/spotify/login';
+  const spotifyLoginUrl = `${
+    process.env.NEXT_PUBLIC_CORE_API_URL || 'http://localhost:3001'
+  }/auth/spotify/login`;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden">

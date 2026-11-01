@@ -6,7 +6,7 @@ import { Track } from '../store/usePlaylistStore';
 
 interface SearchSpotifyProps {
   onSearch: (query: string) => Promise<Track[]>;
-  onAddTrack: (track: Track) => void;
+  onAddTrack: (track: Track) => Promise<void>;
 }
 
 function formatDuration(ms: number): string {
@@ -22,33 +22,40 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || isSearching) return;
     setIsSearching(true);
     setHasSearched(true);
+    setErrorMessage(null);
     try {
       const tracks = await onSearch(query.trim());
       setResults(tracks);
-    } catch {
+    } catch (error) {
       setResults([]);
+      setErrorMessage(error instanceof Error ? error.message : 'ค้นหาเพลงไม่สำเร็จ');
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleAdd = (track: Track) => {
-    onAddTrack(track);
-    setAddedIds((prev) => new Set(prev).add(track.id));
-    // Reset the tick after 2.5s so user can re-add if needed
-    setTimeout(() => {
-      setAddedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(track.id);
-        return next;
-      });
-    }, 2500);
+  const handleAdd = async (track: Track) => {
+    try {
+      await onAddTrack(track);
+      setAddedIds((prev) => new Set(prev).add(track.id));
+      // Reset the tick after 2.5s so user can re-add if needed
+      setTimeout(() => {
+        setAddedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(track.id);
+          return next;
+        });
+      }, 2500);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'เพิ่มเพลงไม่สำเร็จ');
+    }
   };
 
   return (
@@ -79,6 +86,12 @@ export function SearchSpotify({ onSearch, onAddTrack }: SearchSpotifyProps) {
           {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Search className="w-4 h-4" /><span>ค้นหา</span></>}
         </button>
       </form>
+
+      {errorMessage && (
+        <p className="mb-3 rounded-lg border border-[#6b3020] bg-[#2a1714] px-3 py-2 text-xs text-[#ffb09b]">
+          {errorMessage}
+        </p>
+      )}
 
       {/* Results list */}
       <div className="space-y-2 max-h-72 overflow-y-auto pr-1 custom-scrollbar">

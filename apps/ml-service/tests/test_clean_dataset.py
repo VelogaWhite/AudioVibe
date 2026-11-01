@@ -1,11 +1,10 @@
 """Unit tests for the data cleaning pipeline script."""
 
-import os
 from pathlib import Path
 import pandas as pd
 import pytest
 
-from scripts.clean_dataset import clean_spotify_dataset, REQUIRED_COLUMNS
+from scripts.clean_dataset import clean_spotify_dataset
 
 
 class TestCleanDataset:
@@ -125,6 +124,71 @@ class TestCleanDataset:
         # Check export files exist
         assert out_csv.exists()
         assert (backend_dir / out_csv.name).exists()
+
+    def test_clean_dataset_hybrid_merge(
+        self, raw_csv_file: Path, tmp_path: Path
+    ) -> None:
+        """Test hybrid merge with high_popularity and low_popularity datasets."""
+        high_csv = tmp_path / "high.csv"
+        low_csv = tmp_path / "low.csv"
+        out_csv = tmp_path / "hybrid_cleaned.csv"
+
+        pd.DataFrame(
+            [
+                {
+                    "track_id": "high_2024_1",
+                    "track_name": "APT.",
+                    "track_artist": "ROSE & Bruno Mars",
+                    "track_album_name": "APT. Single",
+                    "playlist_genre": "pop",
+                    "track_popularity": 98,
+                    "duration_ms": 170000,
+                    "danceability": 0.78,
+                    "valence": 0.89,
+                    "energy": 0.82,
+                    "acousticness": 0.08,
+                    "instrumentalness": 0.0,
+                    "liveness": 0.12,
+                    "speechiness": 0.06,
+                }
+            ]
+        ).to_csv(high_csv, index=False)
+
+        pd.DataFrame(
+            [
+                {
+                    "track_id": "low_lofi_1",
+                    "track_name": "Late Night Study",
+                    "track_artist": "Lofi Girl",
+                    "track_album_name": "Chill Beats",
+                    "playlist_genre": "lofi",
+                    "track_popularity": 55,
+                    "duration_ms": 150000,
+                    "danceability": 0.60,
+                    "valence": 0.45,
+                    "energy": 0.25,
+                    "acousticness": 0.80,
+                    "instrumentalness": 0.85,
+                    "liveness": 0.10,
+                    "speechiness": 0.04,
+                }
+            ]
+        ).to_csv(low_csv, index=False)
+
+        merged_df = clean_spotify_dataset(
+            input_path=raw_csv_file,
+            output_path=out_csv,
+            sample_size=10,
+            deliver_to_backend=False,
+            high_pop_path=high_csv,
+            low_pop_path=low_csv,
+        )
+
+        assert len(merged_df) == 4
+        assert set(merged_df["track_id"]) == {"high_2024_1", "low_lofi_1", "dup_1", "valid_2"}
+        lofi_row = merged_df[merged_df["track_id"] == "low_lofi_1"].iloc[0]
+        assert lofi_row["genre"] == "Lo-Fi"
+        assert lofi_row["album_name"] == "Chill Beats"
 
     def test_clean_dataset_nonexistent_file_raises_error(self, tmp_path: Path) -> None:
         """Test clean_dataset raises FileNotFoundError on missing file."""

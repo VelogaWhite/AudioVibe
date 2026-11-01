@@ -111,10 +111,12 @@ async def recommend(request: RecommendRequest) -> RecommendResponse:
             preset_name=request.preset_name,
         )
 
-        # In-memory matrix dot product search
+        # In-memory matrix dot product search + genre/magnitude alignment
+        combined_query = f"{request.prompt or ''} {request.preset_name or ''}".strip()
         tracks = vector_store.search(
             target_vector=target_vector.to_list(),
             limit=request.limit,
+            query_text=combined_query,
         )
 
         query_type = "preset" if request.preset_name and not request.prompt else "prompt"
@@ -162,6 +164,7 @@ async def refine(request: RefineRequest) -> RefineResponse:
             target_vector=refined_vector.to_list(),
             limit=request.limit,
             exclude_ids=request.current_track_ids,
+            query_text=request.instruction,
         )
 
         return RefineResponse(

@@ -29,9 +29,16 @@ import {
   renamePlaylist as apiRenamePlaylist,
   deletePlaylist as apiDeletePlaylist,
   searchSpotifyTracks,
+  addTracksToPlaylist,
+  removeTrackFromPlaylist,
+  reorderPlaylistTracks,
   exportPlaylistToSpotify,
   generateAIRecommendations,
 } from '../../lib/api';
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'เกิดข้อผิดพลาดที่ไม่ทราบสาเหตุ';
+}
 
 // Dynamic import with ssr: false to prevent Recharts SVG hydration freeze!
 const AudioRadarChart = dynamic(
@@ -57,13 +64,9 @@ export default function UnifiedPlaylistStudioPage() {
     setPlaylists,
     setMode,
     setThemeVibe,
-    addTrack,
-    removeTrack,
-    reorderTracks,
     setExportModalOpen,
   } = usePlaylistStore();
 
-  const [hasMounted, setHasMounted] = useState(false);
   const [user, setUser] = useState<{
     id: string;
     displayName: string;
@@ -81,11 +84,6 @@ export default function UnifiedPlaylistStudioPage() {
   const [aiFeatures, setAiFeatures] = useState<AudioFeatures | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>('พร้อมใช้งาน');
 
-  // Prevent SSR Hydration Mismatch
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
   // 1. Initial Load: Get userId from URL or LocalStorage
   const loadInitialData = useCallback(async () => {
     let activeUserId: string | undefined = undefined;
@@ -101,29 +99,29 @@ export default function UnifiedPlaylistStudioPage() {
       }
     }
 
+    if (!activeUserId) {
+      setStatusMessage('กรุณาเข้าสู่ระบบ Spotify ก่อนใช้งาน Studio');
+      return;
+    }
+
     try {
       const profile = await fetchUserProfile(activeUserId);
-      if (profile) {
-        setUser(profile);
-        if (profile.id) {
-          localStorage.setItem('audiovibe_user_id', profile.id);
-          const userPlaylists = await fetchPlaylists(profile.id);
-          if (userPlaylists.length > 0) {
-            setPlaylists(userPlaylists);
-            setPlaylist(userPlaylists[0]);
-          }
-        }
-      }
-    } catch (err: any) {
-      setStatusMessage(`Error: ${err.message}`);
+      setUser(profile);
+      localStorage.setItem('audiovibe_user_id', profile.id);
+      const userPlaylists = await fetchPlaylists(profile.id);
+      setPlaylists(userPlaylists);
+      setPlaylist(userPlaylists[0] || null);
+    } catch (err: unknown) {
+      setStatusMessage(`โหลดข้อมูลไม่สำเร็จ: ${getErrorMessage(err)}`);
     }
   }, [setPlaylist, setPlaylists]);
 
   useEffect(() => {
-    if (hasMounted) {
-      loadInitialData();
-    }
-  }, [hasMounted, loadInitialData]);
+    const timer = window.setTimeout(() => {
+      void loadInitialData();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadInitialData]);
 
   // Handle Playlist Selection
   const handleSelectPlaylist = (id: string) => {
@@ -132,57 +130,49 @@ export default function UnifiedPlaylistStudioPage() {
     setMode('MANUAL_MANAGER');
   };
 
-  // Handle Create Playlist (with instant fallback so button always works!)
+  // Handle Create Playlist
   const handleCreatePlaylist = async () => {
     const name = prompt('ตั้งชื่อเพลย์ลิสต์ใหม่:', 'My AudioVibe Playlist');
     if (!name?.trim()) return;
+    if (!user.id) {
+      setStatusMessage('ต้องเข้าสู่ระบบก่อนสร้างเพลย์ลิสต์');
+      return;
+    }
 
     const trimmedName = name.trim();
     try {
       const newP = await apiCreatePlaylist(user.id, trimmedName);
-      const updated = [newP, ...playlists];
-      setPlaylists(updated);
+      setPlaylists([newP, ...playlists]);
       setPlaylist(newP);
       setStatusMessage(`สร้างเพลย์ลิสต์ "${trimmedName}" สำเร็จแล้ว`);
-    } catch {
-      // Fallback local creation if offline or network error
-      const localP = {
-        id: `local-p-${Date.now()}`,
-        name: trimmedName,
-        isPublic: true,
-        isExported: false,
-        tracks: [],
-      };
-      const updated = [localP, ...playlists];
-      setPlaylists(updated);
-      setPlaylist(localP);
-      setStatusMessage(`สร้างเพลย์ลิสต์ "${trimmedName}" สำเร็จแล้ว`);
+    } catch (err: unknown) {
+      setStatusMessage(`สร้างเพลย์ลิสต์ไม่สำเร็จ: ${getErrorMessage(err)}`);
     }
   };
 
   // Handle Rename Playlist
   const handleRenamePlaylist = async () => {
-    if (!currentPlaylist) return;
+    if (!currentPlaylist || !user.id) return;
     const newName = prompt('ชื่อเพลย์ลิสต์ใหม่:', currentPlaylist.name);
     if (!newName?.trim()) return;
 
     const trimmed = newName.trim();
     try {
       await apiRenamePlaylist(user.id, currentPlaylist.id, trimmed);
-    } catch {
-      // fallback local update
+      const updated = playlists.map((p) =>
+        p.id === currentPlaylist.id ? { ...p, name: trimmed } : p,
+      );
+      setPlaylists(updated);
+      setPlaylist({ ...currentPlaylist, name: trimmed });
+      setStatusMessage(`เปลี่ยนชื่อเป็น "${trimmed}" สำเร็จ`);
+    } catch (err: unknown) {
+      setStatusMessage(`เปลี่ยนชื่อไม่สำเร็จ: ${getErrorMessage(err)}`);
     }
-    const updated = playlists.map((p) =>
-      p.id === currentPlaylist.id ? { ...p, name: trimmed } : p,
-    );
-    setPlaylists(updated);
-    setPlaylist({ ...currentPlaylist, name: trimmed });
-    setStatusMessage(`เปลี่ยนชื่อเป็น "${trimmed}" สำเร็จ`);
   };
 
   // Handle Delete Playlist
   const handleDeletePlaylist = async () => {
-    if (!currentPlaylist) return;
+    if (!currentPlaylist || !user.id) return;
     if (
       !confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบเพลย์ลิสต์ "${currentPlaylist.name}"?`)
     )
@@ -190,13 +180,13 @@ export default function UnifiedPlaylistStudioPage() {
 
     try {
       await apiDeletePlaylist(user.id, currentPlaylist.id);
-    } catch {
-      // fallback local delete
+      const remaining = playlists.filter((p) => p.id !== currentPlaylist.id);
+      setPlaylists(remaining);
+      setPlaylist(remaining[0] || null);
+      setStatusMessage('ลบเพลย์ลิสต์เรียบร้อยแล้ว');
+    } catch (err: unknown) {
+      setStatusMessage(`ลบเพลย์ลิสต์ไม่สำเร็จ: ${getErrorMessage(err)}`);
     }
-    const remaining = playlists.filter((p) => p.id !== currentPlaylist.id);
-    setPlaylists(remaining);
-    setPlaylist(remaining[0] || null);
-    setStatusMessage(`ลบเพลย์ลิสต์เรียบร้อยแล้ว`);
   };
 
   // Handle AI Recommendation
@@ -239,7 +229,8 @@ export default function UnifiedPlaylistStudioPage() {
     setThemeVibe(themeToSet);
 
     try {
-      const result = await generateAIRecommendations(user.id, promptText, presetLabel);
+      if (!user.id) throw new Error('ต้องเข้าสู่ระบบก่อนใช้ AI แนะนำเพลง');
+      const result = await generateAIRecommendations(promptText, presetLabel);
       setAiFeatures(result.targetFeatures);
 
       // Create or locate playlist title for AI result
@@ -247,69 +238,30 @@ export default function UnifiedPlaylistStudioPage() {
         ? `Vibe: ${presetLabel}`
         : `AI Vibe: ${promptText.slice(0, 18)}...`;
 
-      // Check if an AI playlist with this exact title already exists
-      const existingPlaylistIndex = playlists.findIndex(
-        (p) => p.name.trim().toLowerCase() === playlistTitle.trim().toLowerCase(),
+      const aiPlaylist = await apiCreatePlaylist(user.id, playlistTitle);
+      const persistedPlaylist = await addTracksToPlaylist(
+        user.id,
+        aiPlaylist.id,
+        result.tracks,
       );
-
-      if (existingPlaylistIndex !== -1) {
-        const existing = playlists[existingPlaylistIndex];
-
-        // Check if tracks are identical (matching by title & artist name)
-        const isIdenticalTracks =
-          existing.tracks.length === result.tracks.length &&
-          existing.tracks.every((t, idx) => {
-            const newT = result.tracks[idx];
-            return (
-              newT &&
-              t.title.trim().toLowerCase() === newT.title.trim().toLowerCase() &&
-              t.artistName.trim().toLowerCase() === newT.artistName.trim().toLowerCase()
-            );
-          });
-
-        if (isIdenticalTracks) {
-          // If name and tracks are already the same, do NOT create a duplicate! Just select it
-          setPlaylist(existing);
-          setMode('AI_ANALYTICS');
-          setStatusMessage(
-            `ใช้งานเพลย์ลิสต์ "${playlistTitle}" เดิม (${result.tracks.length} เพลง) ไม่สร้างซ้ำ`,
-          );
-          return;
-        } else {
-          // If name matches but tracks changed, update the existing playlist in-place
-          const updatedPlaylist = {
-            ...existing,
-            tracks: result.tracks,
-          };
-          const updatedList = [...playlists];
-          updatedList[existingPlaylistIndex] = updatedPlaylist;
-          setPlaylists(updatedList);
-          setPlaylist(updatedPlaylist);
-          setMode('AI_ANALYTICS');
-          setStatusMessage(
-            `อัปเดตเพลงใน "${playlistTitle}" สำเร็จ (${result.tracks.length} เพลง)`,
-          );
-          return;
-        }
-      }
-
-      // If playlist doesn't exist yet, create a new one
-      const aiPlaylist = {
-        id: `ai-${Date.now()}`,
-        name: playlistTitle,
-        isPublic: true,
-        isExported: false,
-        tracks: result.tracks,
+      const scoreMap = new Map(result.tracks.map((t) => [t.id, t]));
+      const enrichedPlaylist = {
+        ...persistedPlaylist,
+        tracks: persistedPlaylist.tracks.map((t) => ({
+          ...t,
+          matchScore: scoreMap.get(t.id)?.matchScore ?? t.matchScore,
+          audioFeatures: t.audioFeatures ?? scoreMap.get(t.id)?.audioFeatures,
+        })),
       };
 
-      setPlaylists([aiPlaylist, ...playlists]);
-      setPlaylist(aiPlaylist);
+      setPlaylists([enrichedPlaylist, ...playlists]);
+      setPlaylist(enrichedPlaylist);
 
       // SPEC: Switch to AI_ANALYTICS mode so Radar Chart is displayed!
       setMode('AI_ANALYTICS');
       setStatusMessage(`AI แนะนำสำเร็จ! พบ ${result.tracks.length} เพลงที่เข้ากับมิติเสียง`);
-    } catch (err: any) {
-      alert(`AI แนะนำไม่สำเร็จ: ${err.message}`);
+    } catch (err: unknown) {
+      setStatusMessage(`AI แนะนำไม่สำเร็จ: ${getErrorMessage(err)}`);
     } finally {
       setIsGenerating(false);
     }
@@ -321,14 +273,47 @@ export default function UnifiedPlaylistStudioPage() {
   };
 
   // Handle Add Track manually from search
-  const handleAddTrack = (track: Track) => {
-    if (!currentPlaylist) {
-      alert('กรุณาสร้างหรือเลือกเพลย์ลิสต์ก่อนทำการเพิ่มเพลง');
+  const handleAddTrack = async (track: Track) => {
+    if (!currentPlaylist || !user.id) {
+      setStatusMessage('กรุณาเข้าสู่ระบบและเลือกเพลย์ลิสต์ก่อนเพิ่มเพลง');
       return;
     }
-    // Spec: Adding track manually switches mode to MANUAL_MANAGER (hiding radar chart)
-    addTrack(track);
-    setStatusMessage(`เพิ่ม "${track.title}" เข้าเพลย์ลิสต์แล้ว`);
+    try {
+      const updated = await addTracksToPlaylist(user.id, currentPlaylist.id, [track]);
+      setPlaylist(updated);
+      setPlaylists(playlists.map((p) => (p.id === updated.id ? updated : p)));
+      setStatusMessage(`เพิ่ม "${track.title}" เข้าเพลย์ลิสต์แล้ว`);
+    } catch (err: unknown) {
+      setStatusMessage(`เพิ่มเพลงไม่สำเร็จ: ${getErrorMessage(err)}`);
+    }
+  };
+
+  const handleRemoveTrack = async (trackId: string) => {
+    if (!currentPlaylist || !user.id) return;
+    try {
+      const updated = await removeTrackFromPlaylist(user.id, currentPlaylist.id, trackId);
+      setPlaylist(updated);
+      setPlaylists(playlists.map((p) => (p.id === updated.id ? updated : p)));
+      setStatusMessage('ลบเพลงออกจากเพลย์ลิสต์แล้ว');
+    } catch (err: unknown) {
+      setStatusMessage(`ลบเพลงไม่สำเร็จ: ${getErrorMessage(err)}`);
+    }
+  };
+
+  const handleReorderTracks = async (fromIndex: number, toIndex: number) => {
+    if (!currentPlaylist || !user.id || fromIndex === toIndex) return;
+    const trackIds = tracks.map((track) => track.id);
+    const [movedTrackId] = trackIds.splice(fromIndex, 1);
+    if (!movedTrackId) return;
+    trackIds.splice(toIndex, 0, movedTrackId);
+    try {
+      const updated = await reorderPlaylistTracks(user.id, currentPlaylist.id, trackIds);
+      setPlaylist(updated);
+      setPlaylists(playlists.map((p) => (p.id === updated.id ? updated : p)));
+      setStatusMessage('จัดลำดับเพลงเรียบร้อยแล้ว');
+    } catch (err: unknown) {
+      setStatusMessage(`จัดลำดับเพลงไม่สำเร็จ: ${getErrorMessage(err)}`);
+    }
   };
 
   // Handle Export to Spotify
@@ -356,25 +341,12 @@ export default function UnifiedPlaylistStudioPage() {
 
       setExportModalOpen(true, res.spotifyPlaylistId);
       setStatusMessage('ส่งออกเพลย์ลิสต์เข้า Spotify สำเร็จแล้ว!');
-    } catch (err: any) {
-      alert(`Export ไม่สำเร็จ: ${err.message}`);
+    } catch (err: unknown) {
+      setStatusMessage(`Export ไม่สำเร็จ: ${getErrorMessage(err)}`);
     } finally {
       setIsExporting(false);
     }
   };
-
-  if (!hasMounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#070d0a] text-[#1ed760]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-[#1ed760] border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-semibold tracking-wider text-[#a9edbd]">
-            กำลังเปิด AudioVibe Studio...
-          </span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto flex flex-col relative transition-colors duration-700">
@@ -398,6 +370,7 @@ export default function UnifiedPlaylistStudioPage() {
               <h1 className="text-xl font-extrabold text-white tracking-tight">
                 Audio<span className="text-[#1ed760]">Vibe</span> Studio
               </h1>
+              <p className="text-xs text-[#82a691]">{statusMessage}</p>
             </div>
           </div>
         </div>
@@ -469,8 +442,8 @@ export default function UnifiedPlaylistStudioPage() {
                     track={track}
                     index={idx}
                     totalTracks={tracks.length}
-                    onRemove={removeTrack}
-                    onMove={reorderTracks}
+                    onRemove={handleRemoveTrack}
+                    onMove={handleReorderTracks}
                   />
                 ))
               ) : (
